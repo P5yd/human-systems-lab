@@ -1,14 +1,10 @@
 // Module: Money & Budgeting
 // Content authored from the user's curriculum design (2026-08-17), adapted to
-// the engine's choice→consequence format per the "adapt everything to
-// choices now" decision. NOTE: the original design used a true budget
-// allocator (sliders across categories, multiple sequential random events)
-// and a separate "Financial Survival Game" signature activity. Both are
-// folded here into a small set of budgeting *strategies* as choices, with
-// consequence text narrating how each strategy handles the events the
-// curriculum specified. This trades the real allocation mechanic for
-// immediate playability — a true budget-slider screen is future engine work,
-// not content work, if you want to restore that fidelity later.
+// the engine's choice→consequence format. NOTE: the original design used a
+// true budget allocator and a separate "Financial Survival Game" signature
+// activity, both folded here into budgeting *strategies* as choices — see
+// the fidelity note in the action plan. Each choice carries a `dcera` score
+// and `reason`, added 2026-08-18 for automatic scoring.
 
 const MODULE_MONEY_BUDGETING = {
   id: "money-budgeting",
@@ -27,10 +23,10 @@ const MODULE_MONEY_BUDGETING = {
             "What would you regret not saving for?"
           ],
           choices: [
-            { id: "A", text: "Balanced spender — spread evenly across food, fun, transport, and a little savings." },
-            { id: "B", text: "Saver — spend only on essentials, save the rest." },
-            { id: "C", text: "Spender — enjoy the month, worry about savings later." },
-            { id: "D", text: "Cautious planner — keep a large emergency cushion, spend little elsewhere." }
+            { id: "A", text: "Balanced spender — spread evenly across food, fun, transport, and a little savings.", dcera: { D: 3, C: 3, E: 3, R: 2, A: 4 }, reason: "A reasonable middle path — covers most surprises, but the emergency draws savings down to nothing." },
+            { id: "B", text: "Saver — spend only on essentials, save the rest.", dcera: { D: 4, C: 5, E: 2, R: 5, A: 3 }, reason: "Handles every surprise without strain, at the cost of skipping the month's shared fun." },
+            { id: "C", text: "Spender — enjoy the month, worry about savings later.", dcera: { D: 1, C: 1, E: 2, R: 1, A: 2 }, reason: "Enjoys the month fully but has nothing left when the real surprise hits." },
+            { id: "D", text: "Cautious planner — keep a large emergency cushion, spend little elsewhere.", dcera: { D: 4, C: 4, E: 2, R: 5, A: 2 }, reason: "The safest financial outcome, but the least flexible — friends noticed what was skipped." }
           ],
           consequences: {
             A: "Your balance covers a friend's birthday gift and the class trip comfortably. When your headphones break mid-month, you dip into savings — leaving almost nothing saved by month's end, but nothing skipped either.",
@@ -50,10 +46,10 @@ const MODULE_MONEY_BUDGETING = {
             "Who do you tell, and when?"
           ],
           choices: [
-            { id: "A", text: "Ask parents for extra money to cover the gap." },
-            { id: "B", text: "Cut entertainment and transport spending for the rest of the month." },
-            { id: "C", text: "Borrow ₹300 from a friend, pay them back next month." },
-            { id: "D", text: "Do nothing differently and see what happens." }
+            { id: "A", text: "Ask parents for extra money to cover the gap.", dcera: { D: 3, C: 3, E: 2, R: 4, A: 3 }, reason: "Solves the immediate problem completely, at the cost of some independence." },
+            { id: "B", text: "Cut entertainment and transport spending for the rest of the month.", dcera: { D: 4, C: 4, E: 3, R: 4, A: 4 }, reason: "Solves it yourself through direct trade-offs — effective, if a little uncomfortable." },
+            { id: "C", text: "Borrow ₹300 from a friend, pay them back next month.", dcera: { D: 2, C: 2, E: 3, R: 2, A: 2 }, reason: "Fixes this month by borrowing against next month — the gap doesn't disappear, it moves." },
+            { id: "D", text: "Do nothing differently and see what happens.", dcera: { D: 1, C: 1, E: 2, R: 1, A: 1 }, reason: "Avoids the decision until it becomes unavoidable, with less time to plan a response." }
           ],
           consequences: {
             A: "The gap is covered immediately, but you'll need to explain what happened and may lose some independence next month.",
@@ -78,10 +74,10 @@ const MODULE_MONEY_BUDGETING = {
             "What would you want to be true about your finances a year from now?"
           ],
           choices: [
-            { id: "A", text: "Balanced — rent, essentials, and a modest savings habit from month one." },
-            { id: "B", text: "Aggressive saver — minimal lifestyle, maximum savings and investment." },
-            { id: "C", text: "Comfortable now — enjoy your first real income, save what's left." },
-            { id: "D", text: "Family-first — prioritize sending money home, live modestly yourself." }
+            { id: "A", text: "Balanced — rent, essentials, and a modest savings habit from month one.", dcera: { D: 5, C: 5, E: 4, R: 5, A: 4 }, reason: "Handles every event of the year with room to spare — the clearest evidence a plan was actually working." },
+            { id: "B", text: "Aggressive saver — minimal lifestyle, maximum savings and investment.", dcera: { D: 3, C: 4, E: 1, R: 5, A: 2 }, reason: "Financially bulletproof, but the cost shows up socially, not on a spreadsheet." },
+            { id: "C", text: "Comfortable now — enjoy your first real income, save what's left.", dcera: { D: 2, C: 2, E: 3, R: 1, A: 2 }, reason: "Manageable until two things go wrong close together — which is exactly what happened." },
+            { id: "D", text: "Family-first — prioritize sending money home, live modestly yourself.", dcera: { D: 3, C: 3, E: 5, R: 2, A: 3 }, reason: "Consistently prioritizes others, which is admirable but leaves nothing set aside for yourself." }
           ],
           consequences: {
             A: "Your phone repair in month 3 barely dents your plan. In month 5 you're able to lend your friend part of what they need without real strain. The bonus in month 7 goes straight to savings. By month 9's unexpected trip, you have enough set aside to travel without a second thought.",
@@ -101,10 +97,10 @@ const MODULE_MONEY_BUDGETING = {
             "What's the real cost of not having this covered?"
           ],
           choices: [
-            { id: "A", text: "Pay it from savings immediately." },
-            { id: "B", text: "Take a short-term loan and pay it back over 3 months." },
-            { id: "C", text: "Delay a personal expense to cover part of it, borrow the rest from a friend." },
-            { id: "D", text: "You don't have it — ask your family to find another way." }
+            { id: "A", text: "Pay it from savings immediately.", dcera: { D: 5, C: 5, E: 4, R: 5, A: 4 }, reason: "This is the entire point of a fund like this — it does its job without drama." },
+            { id: "B", text: "Take a short-term loan and pay it back over 3 months.", dcera: { D: 2, C: 2, E: 3, R: 2, A: 2 }, reason: "Solves the timing problem but adds a cost that a plan earlier in the year would have avoided." },
+            { id: "C", text: "Delay a personal expense to cover part of it, borrow the rest from a friend.", dcera: { D: 3, C: 3, E: 3, R: 2, A: 3 }, reason: "A workable patch, but it quietly puts a financial weight on a personal relationship." },
+            { id: "D", text: "You don't have it — ask your family to find another way.", dcera: { D: 1, C: 2, E: 2, R: 1, A: 2 }, reason: "The gap still gets closed, just with more difficulty than the situation needed." }
           ],
           consequences: {
             A: "It's stressful but manageable. Your emergency fund exists for exactly this, and it does its job.",

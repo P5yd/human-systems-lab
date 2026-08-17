@@ -1,7 +1,8 @@
-// LIFE SKILLS PLATFORM — engine.js
-// Generic state machine: session setup, the seven-beat scenario flow, the
-// DCERA scoring loop, and the end-of-session debrief. Never references
-// module content by name — modules are pure data (see content/*.js).
+// HUMAN SYSTEMS LAB — engine.js
+// Generic state machine: session setup, the seven-beat scenario flow with
+// simultaneous team answering, automatic DCERA scoring, a live scoreboard,
+// and an end-of-session winner reveal. Never references module content by
+// name — modules are pure data (see content/*.js).
 
 const AVAILABLE_MODULES = [
   MODULE_DECISION_MAKING,
@@ -19,8 +20,10 @@ const DCERA_DIMS = [
   { letter: "A", name: "Adaptability" }
 ];
 
-const BEAT_LABELS = ["Hook", "Individual", "Team talk", "Choices", "Reveal", "Reflect", "Takeaway"];
+const BEAT_LABELS = ["Hook", "Think", "Discuss", "Answer", "Results", "Reflect", "Takeaway"];
 const SHEET_URL_KEY = "hsl_sheet_url";
+const TEAM_COLORS = ["#F43F5E", "#8B5CF6", "#22D3A5", "#FBBF24", "#3B82F6", "#FB7185", "#34D399", "#F472B6", "#60A5FA", "#C084FC"];
+const REDUCE_MOTION = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 let state = null;
 let timerInterval = null;
@@ -32,15 +35,14 @@ function freshState() {
     level: "L1",
     moduleId: AVAILABLE_MODULES[0].id,
     sheetUrl: localStorage.getItem(SHEET_URL_KEY) || "",
-    syncStatus: "idle", // idle | saving | saved | error
+    syncStatus: "idle",
     teams: [],
     nextTeamNum: 1,
     scenarioIndex: 0,
-    teamTurnIndex: 0,
-    currentChoiceId: null,
-    pendingDcera: { D: 0, C: 0, E: 0, R: 0, A: 0 },
-    scores: {}, // scores[teamId][scenarioId] = {D,C,E,R,A}
-    log: [] // [{scenarioId, teamId, choiceId, dcera}]
+    activeTeamIndex: 0,
+    pendingAnswers: {}, // teamId -> choiceId, for the scenario currently being answered
+    scores: {},          // scores[teamId][scenarioId] = { D, C, E, R, A }
+    log: []               // [{ scenarioId, teamId, choiceId, dcera }]
   };
 }
 
@@ -49,27 +51,15 @@ function init() {
   render();
 }
 
-function currentModule() {
-  return AVAILABLE_MODULES.find(m => m.id === state.moduleId);
-}
-function currentScenarios() {
-  return currentModule().levels[state.level].scenarios;
-}
-function currentScenario() {
-  return currentScenarios()[state.scenarioIndex];
-}
-function currentTeam() {
-  return state.teams[state.teamTurnIndex];
-}
+function currentModule() { return AVAILABLE_MODULES.find(m => m.id === state.moduleId); }
+function currentScenarios() { return currentModule().levels[state.level].scenarios; }
+function currentScenario() { return currentScenarios()[state.scenarioIndex]; }
+function getChoice(scenario, choiceId) { return scenario.choices.find(c => c.id === choiceId); }
 function getConsequenceText(scenario, choiceId) {
-  if (typeof scenario.consequenceFor === "function") {
-    return scenario.consequenceFor(choiceId);
-  }
+  if (typeof scenario.consequenceFor === "function") return scenario.consequenceFor(choiceId);
   return scenario.consequences[choiceId];
 }
-function clearTimer() {
-  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-}
+function clearTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
 function stopAndGo(fn) { clearTimer(); fn(); }
 
 function el(html) {
@@ -87,9 +77,8 @@ function render() {
     hook: renderHook,
     think: renderThink,
     discuss: renderDiscuss,
-    teamChoice: renderTeamChoice,
-    consequence: renderConsequence,
-    dcera: renderDcera,
+    answerAll: renderAnswerAll,
+    results: renderResults,
     reflection: renderReflection,
     takeaway: renderTakeaway,
     debrief: renderDebrief
@@ -97,17 +86,45 @@ function render() {
   app.appendChild(map[state.screen]());
 }
 
+// ---------- SHARED CHROME ----------
+
 function progressDots(activeIdx) {
   return `<div class="progress">${BEAT_LABELS.map((_, i) =>
     `<span class="dot ${i < activeIdx ? "done" : ""} ${i === activeIdx ? "current" : ""}"></span>`
   ).join("")}</div>`;
 }
 
+function teamTotal(teamId) {
+  const perScenario = Object.values(state.scores[teamId] || {});
+  let total = 0;
+  perScenario.forEach(sc => DCERA_DIMS.forEach(d => total += sc[d.letter]));
+  return total;
+}
+
+function scoreboardStrip() {
+  if (!state.teams.length) return "";
+  const max = Math.max(1, ...state.teams.map(t => teamTotal(t.id)));
+  return `<div class="scoreboard no-print">
+    ${state.teams.map(t => {
+      const total = teamTotal(t.id);
+      const pct = Math.round((total / (max || 1)) * 100);
+      return `<div class="sb-team">
+        <span class="sb-dot" style="background:${t.color}"></span>
+        <span class="sb-name">${t.name}</span>
+        <span class="sb-bar-track"><span class="sb-bar-fill" style="width:${pct}%; background:${t.color};"></span></span>
+        <span class="sb-total">${total}</span>
+      </div>`;
+    }).join("")}
+  </div>`;
+}
+
 function sessionHeader(sub) {
   return `<div class="row no-print" style="justify-content:space-between; align-items:baseline;">
     <span class="eyebrow">${currentModule().title} · ${currentModule().levels[state.level].label}</span>
     <span class="pill">${state.className || "Unnamed class"}</span>
-  </div>${sub || ""}`;
+  </div>
+  ${scoreboardStrip()}
+  ${sub || ""}`;
 }
 
 // ---------- LAUNCHER ----------
@@ -171,7 +188,8 @@ function renderLauncher() {
   wrap.querySelector("#addTeamBtn").addEventListener("click", () => {
     const name = prompt("Team name?", `Team ${state.nextTeamNum}`);
     if (!name) return;
-    state.teams.push({ id: "t" + Date.now() + Math.random().toString(36).slice(2, 6), name, members: [] });
+    const color = TEAM_COLORS[state.teams.length % TEAM_COLORS.length];
+    state.teams.push({ id: "t" + Date.now() + Math.random().toString(36).slice(2, 6), name, members: [], color });
     state.nextTeamNum++;
     render();
   });
@@ -191,7 +209,7 @@ function renderLauncher() {
 function renderTeamList(container) {
   container.innerHTML = "";
   state.teams.forEach(team => {
-    const row = el(`<div class="team-row">
+    const row = el(`<div class="team-row" style="border-left: 4px solid ${team.color};">
       <span class="name">${team.name}</span>
       <span class="members">${team.members.length ? team.members.join(", ") : "no members added"}</span>
       <button class="btn" data-act="member">+ member</button>
@@ -228,6 +246,25 @@ function renderHook() {
   return wrap;
 }
 
+// ---------- TIMER HELPER ----------
+
+function timerBlock(seconds, onDone) {
+  return { seconds, onDone };
+}
+
+function mountTimer(wrap, totalSeconds) {
+  let remaining = totalSeconds;
+  const display = wrap.querySelector("#timerDisplay");
+  const bar = wrap.querySelector("#timerBar");
+  timerInterval = setInterval(() => {
+    remaining--;
+    const m = Math.floor(remaining / 60), sec = remaining % 60;
+    if (display) display.textContent = `${m}:${sec.toString().padStart(2, "0")}`;
+    if (bar) bar.style.width = `${Math.max(0, (remaining / totalSeconds) * 100)}%`;
+    if (remaining <= 0) clearTimer();
+  }, 1000);
+}
+
 // ---------- THINK (individual) ----------
 
 function renderThink() {
@@ -239,25 +276,20 @@ function renderThink() {
     <div class="card">
       <ul>${s.predictionPrompts.map(p => `<li>${p}</li>`).join("")}</ul>
     </div>
-    <div class="row" style="align-items:center; margin-top:1rem;">
+    <div class="timer-row">
       <div class="timer" id="timerDisplay">1:00</div>
-      <div class="spacer"></div>
+      <div class="timer-track"><div class="timer-fill" id="timerBar" style="width:100%;"></div></div>
+    </div>
+    <div class="row" style="align-items:center;">
       <button class="btn btn-ghost" id="skip">Skip timer</button>
+      <div class="spacer"></div>
       <button class="btn btn-primary" id="next" style="min-width:200px;">Continue</button>
     </div>
   </div>`);
-
-  let remaining = 60;
-  const display = wrap.querySelector("#timerDisplay");
-  timerInterval = setInterval(() => {
-    remaining--;
-    const m = Math.floor(remaining / 60), sec = remaining % 60;
-    display.textContent = `${m}:${sec.toString().padStart(2, "0")}`;
-    if (remaining <= 0) clearTimer();
-  }, 1000);
-
-  wrap.querySelector("#skip").addEventListener("click", () => stopAndGo(() => { state.screen = "discuss"; render(); }));
-  wrap.querySelector("#next").addEventListener("click", () => stopAndGo(() => { state.screen = "discuss"; render(); }));
+  mountTimer(wrap, 60);
+  const go = () => stopAndGo(() => { state.screen = "discuss"; render(); });
+  wrap.querySelector("#skip").addEventListener("click", go);
+  wrap.querySelector("#next").addEventListener("click", go);
   return wrap;
 }
 
@@ -267,129 +299,133 @@ function renderDiscuss() {
   const wrap = el(`<div class="screen">
     ${sessionHeader(progressDots(2))}
     <h2>Team discussion — up to 8 minutes</h2>
-    <p class="lead">Each team talks it over and settles on one answer. When you're ready, move on and teams will answer one at a time.</p>
-    <div class="row" style="align-items:center; margin-top:1rem;">
+    <p class="lead">Each team talks it over and settles on one answer. When you're ready, every team locks in their answer on the next screen.</p>
+    <div class="timer-row">
       <div class="timer" id="timerDisplay">8:00</div>
-      <div class="spacer"></div>
+      <div class="timer-track"><div class="timer-fill" id="timerBar" style="width:100%;"></div></div>
+    </div>
+    <div class="row" style="align-items:center;">
       <button class="btn btn-ghost" id="skip">Skip timer</button>
-      <button class="btn btn-primary" id="next" style="min-width:200px;">Start answering</button>
+      <div class="spacer"></div>
+      <button class="btn btn-primary" id="next" style="min-width:200px;">Everyone answer now</button>
     </div>
   </div>`);
-
-  let remaining = 480;
-  const display = wrap.querySelector("#timerDisplay");
-  timerInterval = setInterval(() => {
-    remaining--;
-    const m = Math.floor(remaining / 60), sec = remaining % 60;
-    display.textContent = `${m}:${sec.toString().padStart(2, "0")}`;
-    if (remaining <= 0) clearTimer();
-  }, 1000);
-
-  const goNext = () => stopAndGo(() => { state.teamTurnIndex = 0; state.screen = "teamChoice"; render(); });
-  wrap.querySelector("#skip").addEventListener("click", goNext);
-  wrap.querySelector("#next").addEventListener("click", goNext);
+  mountTimer(wrap, 480);
+  const go = () => stopAndGo(() => {
+    state.activeTeamIndex = 0;
+    state.pendingAnswers = {};
+    state.screen = "answerAll";
+    render();
+  });
+  wrap.querySelector("#skip").addEventListener("click", go);
+  wrap.querySelector("#next").addEventListener("click", go);
   return wrap;
 }
 
-// ---------- TEAM CHOICE (loop per team) ----------
+// ---------- ANSWER ALL (simultaneous capture) ----------
 
-function renderTeamChoice() {
+function renderAnswerAll() {
   const s = currentScenario();
-  const team = currentTeam();
+  const allAnswered = state.teams.every(t => state.pendingAnswers[t.id]);
   const wrap = el(`<div class="screen">
     ${sessionHeader(progressDots(3))}
-    <span class="eyebrow">Team ${state.teamTurnIndex + 1} of ${state.teams.length}</span>
-    <h2>${team.name}, what's your call?</h2>
+    <h2>${s.title}</h2>
     <p class="lead">${s.hook}</p>
     ${s.followUpEvent ? `<div class="consequence-box">${s.followUpEvent}</div>` : ""}
-    <div class="choice-list">
+
+    <div class="team-tabs" id="teamTabs">
+      ${state.teams.map((t, i) => `
+        <button class="team-tab ${i === state.activeTeamIndex ? "active" : ""} ${state.pendingAnswers[t.id] ? "answered" : ""}"
+                data-idx="${i}" style="--team-color:${t.color};">
+          <span class="tt-dot"></span>
+          <span class="tt-name">${t.name}</span>
+          ${state.pendingAnswers[t.id] ? `<span class="tt-check">${state.pendingAnswers[t.id]} ✓</span>` : ""}
+        </button>
+      `).join("")}
+    </div>
+
+    <p class="answer-for" id="answerFor">Answering for <strong>${state.teams[state.activeTeamIndex] ? state.teams[state.activeTeamIndex].name : "—"}</strong></p>
+
+    <div class="choice-list" id="choiceList">
       ${s.choices.map(c => `<button class="btn choice-btn" data-id="${c.id}"><span class="tag">${c.id}</span><span>${c.text}</span></button>`).join("")}
     </div>
+
+    <div class="row" style="margin-top:1rem;">
+      <div class="spacer"></div>
+      <button class="btn btn-primary" id="reveal" ${allAnswered ? "" : "disabled"} style="min-width:240px;">Reveal results</button>
+    </div>
   </div>`);
+
+  function setActive(idx) {
+    state.activeTeamIndex = idx;
+    render();
+  }
+
+  wrap.querySelectorAll(".team-tab").forEach(tab => {
+    tab.addEventListener("click", () => setActive(Number(tab.dataset.idx)));
+  });
 
   wrap.querySelectorAll(".choice-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      state.currentChoiceId = btn.dataset.id;
-      state.screen = "consequence";
+      const team = state.teams[state.activeTeamIndex];
+      if (!team) return;
+      state.pendingAnswers[team.id] = btn.dataset.id;
+      const nextUnanswered = state.teams.findIndex(t => !state.pendingAnswers[t.id]);
+      state.activeTeamIndex = nextUnanswered === -1 ? state.activeTeamIndex : nextUnanswered;
       render();
     });
   });
+
+  const revealBtn = wrap.querySelector("#reveal");
+  if (allAnswered) {
+    revealBtn.addEventListener("click", () => {
+      const s2 = currentScenario();
+      state.teams.forEach(team => {
+        const choiceId = state.pendingAnswers[team.id];
+        const choice = getChoice(s2, choiceId);
+        state.scores[team.id][s2.id] = { ...choice.dcera };
+        state.log.push({ scenarioId: s2.id, teamId: team.id, choiceId, dcera: { ...choice.dcera } });
+      });
+      state.screen = "results";
+      render();
+      maybeSyncLive();
+    });
+  }
   return wrap;
 }
 
-// ---------- CONSEQUENCE ----------
+// ---------- RESULTS (auto-scored reveal) ----------
 
-function renderConsequence() {
+function renderResults() {
   const s = currentScenario();
-  const team = currentTeam();
-  const text = getConsequenceText(s, state.currentChoiceId);
   const wrap = el(`<div class="screen">
     ${sessionHeader(progressDots(4))}
-    <span class="eyebrow">${team.name} chose ${state.currentChoiceId}</span>
-    <h2>Here's what happens</h2>
-    <div class="consequence-box">${text}</div>
-    <div class="row" style="margin-top:1rem;">
-      <div class="spacer"></div>
-      <button class="btn btn-primary" id="next" style="min-width:200px;">Score this team</button>
-    </div>
-  </div>`);
-  wrap.querySelector("#next").addEventListener("click", () => {
-    state.pendingDcera = { D: 0, C: 0, E: 0, R: 0, A: 0 };
-    state.screen = "dcera";
-    render();
-  });
-  return wrap;
-}
-
-// ---------- DCERA SCORING ----------
-
-function renderDcera() {
-  const team = currentTeam();
-  const wrap = el(`<div class="screen">
-    ${sessionHeader()}
-    <h2>Score ${team.name}</h2>
-    <p class="lead">Based on their discussion and choice for this scenario — tap 1 to 5 for each.</p>
-    <div class="dcera-grid" id="grid">
-      ${DCERA_DIMS.map(d => `
-        <div class="dcera-dim" data-letter="${d.letter}">
-          <span class="letter">${d.letter}</span>
-          <span class="name">${d.name}</span>
-          <div class="dcera-stars">
-            ${[1,2,3,4,5].map(n => `<button data-n="${n}">${n}</button>`).join("")}
+    <h2>Here's what happened</h2>
+    <div class="results-list">
+      ${state.teams.map((team, i) => {
+        const choiceId = state.pendingAnswers[team.id];
+        const choice = getChoice(s, choiceId);
+        const consequence = getConsequenceText(s, choiceId);
+        return `<div class="result-card" style="--team-color:${team.color}; animation-delay:${REDUCE_MOTION ? 0 : i * 0.12}s;">
+          <div class="result-head">
+            <span class="sb-dot" style="background:${team.color}"></span>
+            <span class="result-team">${team.name}</span>
+            <span class="result-choice">chose ${choiceId}</span>
           </div>
-        </div>
-      `).join("")}
+          <p class="result-consequence">${consequence}</p>
+          <div class="dcera-row">
+            ${DCERA_DIMS.map(d => `<span class="dcera-chip"><b>${d.letter}</b>${choice.dcera[d.letter]}</span>`).join("")}
+          </div>
+          <p class="result-reason">${choice.reason}</p>
+        </div>`;
+      }).join("")}
     </div>
-    <div class="row" style="margin-top:1rem;">
+    <div class="row" style="margin-top:1.5rem;">
       <div class="spacer"></div>
-      <button class="btn btn-primary" id="save" style="min-width:200px;">Save score</button>
+      <button class="btn btn-primary" id="next" style="min-width:200px;">Continue</button>
     </div>
   </div>`);
-
-  wrap.querySelectorAll(".dcera-dim").forEach(dim => {
-    const letter = dim.dataset.letter;
-    dim.querySelectorAll("button").forEach(btn => {
-      btn.addEventListener("click", () => {
-        state.pendingDcera[letter] = Number(btn.dataset.n);
-        dim.querySelectorAll("button").forEach(b => b.classList.toggle("active", Number(b.dataset.n) <= state.pendingDcera[letter]));
-      });
-    });
-  });
-
-  wrap.querySelector("#save").addEventListener("click", () => {
-    const s = currentScenario();
-    const team = currentTeam();
-    state.scores[team.id][s.id] = { ...state.pendingDcera };
-    state.log.push({ scenarioId: s.id, teamId: team.id, choiceId: state.currentChoiceId, dcera: { ...state.pendingDcera } });
-
-    if (state.teamTurnIndex < state.teams.length - 1) {
-      state.teamTurnIndex++;
-      state.screen = "teamChoice";
-    } else {
-      state.screen = "reflection";
-    }
-    render();
-  });
+  wrap.querySelector("#next").addEventListener("click", () => { state.screen = "reflection"; render(); });
   return wrap;
 }
 
@@ -430,7 +466,8 @@ function renderTakeaway() {
       state.screen = "debrief";
     } else {
       state.scenarioIndex++;
-      state.teamTurnIndex = 0;
+      state.activeTeamIndex = 0;
+      state.pendingAnswers = {};
       state.screen = "hook";
     }
     render();
@@ -450,6 +487,13 @@ function avgDcera(teamId) {
   return avg;
 }
 
+function computeWinners() {
+  if (!state.teams.length) return [];
+  const totals = state.teams.map(t => ({ team: t, total: teamTotal(t.id) }));
+  const max = Math.max(...totals.map(t => t.total));
+  return totals.filter(t => t.total === max && max > 0).map(t => t.team);
+}
+
 function buildSyncPayload() {
   return {
     timestamp: new Date().toISOString(),
@@ -460,9 +504,7 @@ function buildSyncPayload() {
       const scenario = currentScenarios().find(s => s.id === entry.scenarioId);
       const team = state.teams.find(t => t.id === entry.teamId);
       return {
-        team: team.name,
-        scenario: scenario.title,
-        choice: entry.choiceId,
+        team: team.name, scenario: scenario.title, choice: entry.choiceId,
         D: entry.dcera.D, C: entry.dcera.C, E: entry.dcera.E, R: entry.dcera.R, A: entry.dcera.A
       };
     })
@@ -471,9 +513,7 @@ function buildSyncPayload() {
 
 function syncStatusLabel() {
   return {
-    idle: "",
-    saving: "Saving…",
-    saved: "Saved to Google Sheet ✓",
+    idle: "", saving: "Saving…", saved: "Saved to Google Sheet ✓",
     error: "Couldn't save — check the sync URL on the launcher and your connection."
   }[state.syncStatus];
 }
@@ -491,24 +531,58 @@ function syncSession() {
     .finally(render);
 }
 
+function maybeSyncLive() {
+  // Best-effort background save after each scenario, silent — the explicit
+  // "Save to Google Sheet" button on debrief remains the reliable path.
+  if (!state.sheetUrl) return;
+  fetch(state.sheetUrl, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(buildSyncPayload())
+  }).catch(() => {});
+}
+
+function spawnConfetti(container) {
+  if (REDUCE_MOTION) return;
+  const colors = [...TEAM_COLORS, "#FBBF24"];
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement("span");
+    piece.className = "confetti-piece";
+    piece.style.left = Math.random() * 100 + "%";
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDelay = (Math.random() * 0.6) + "s";
+    piece.style.animationDuration = (2.2 + Math.random() * 1.4) + "s";
+    piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+    container.appendChild(piece);
+  }
+}
+
 function renderDebrief() {
+  const winners = computeWinners();
+  const winnerText = winners.length === 0 ? "" :
+    winners.length === 1 ? `🏆 ${winners[0].name} wins with the strongest choices this session!` :
+    `🏆 ${winners.map(w => w.name).join(" & ")} tie for the win this session!`;
+
   const wrap = el(`<div class="screen">
     ${sessionHeader()}
     <span class="eyebrow no-print">Session complete</span>
     <h1>${state.className || "Session"} debrief</h1>
     <p class="lead">${currentModule().title} · ${currentModule().levels[state.level].label}</p>
+
+    ${winnerText ? `<div class="winner-banner" id="winnerBanner"><span>${winnerText}</span></div>` : ""}
+
     <div class="card" style="overflow-x:auto;">
       <table>
-        <thead><tr><th>Team</th><th>D</th><th>C</th><th>E</th><th>R</th><th>A</th></tr></thead>
+        <thead><tr><th>Team</th><th>Total</th><th>D</th><th>C</th><th>E</th><th>R</th><th>A</th></tr></thead>
         <tbody>
-          ${state.teams.map(t => {
+          ${state.teams.slice().sort((a, b) => teamTotal(b.id) - teamTotal(a.id)).map(t => {
             const avg = avgDcera(t.id);
-            return `<tr><td>${t.name}</td>${avg ? DCERA_DIMS.map(d => `<td class="num">${avg[d.letter]}</td>`).join("") : `<td colspan="5">no scores recorded</td>`}</tr>`;
+            return `<tr><td><span class="sb-dot" style="background:${t.color}"></span> ${t.name}</td><td class="num"><b>${teamTotal(t.id)}</b></td>${avg ? DCERA_DIMS.map(d => `<td class="num">${avg[d.letter]}</td>`).join("") : `<td colspan="5">no scores recorded</td>`}</tr>`;
           }).join("")}
         </tbody>
       </table>
     </div>
-    <p style="font-size:0.9rem; color:var(--ink-soft);">Averages across all ${currentScenarios().length} scenarios this session. Full per-scenario detail is in the session log below.</p>
+    <p style="font-size:0.9rem; color:var(--ink-soft);">Total = sum of all DCERA points across all ${currentScenarios().length} scenarios. Averages per dimension shown alongside. Full per-scenario detail is in the session log below.</p>
     <div class="card" style="overflow-x:auto;">
       <table>
         <thead><tr><th>Scenario</th><th>Team</th><th>Choice</th><th>D</th><th>C</th><th>E</th><th>R</th><th>A</th></tr></thead>
@@ -528,11 +602,13 @@ function renderDebrief() {
       <div class="spacer"></div>
       <button class="btn btn-primary" id="restart" style="min-width:220px;">New session</button>
     </div>
+    <div class="confetti-layer" id="confettiLayer"></div>
   </div>`);
   wrap.querySelector("#print").addEventListener("click", () => window.print());
   wrap.querySelector("#restart").addEventListener("click", () => init());
   const syncBtn = wrap.querySelector("#sync");
   if (syncBtn) syncBtn.addEventListener("click", syncSession);
+  if (winners.length) spawnConfetti(wrap.querySelector("#confettiLayer"));
   return wrap;
 }
 

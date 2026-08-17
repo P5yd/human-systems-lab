@@ -1,13 +1,9 @@
 // Module: Digital Citizenship & Online Safety
-// Content authored from the user's curriculum design (2026-08-17). "The
-// Viral Post" had explicit choices; the rest were authored to fit the given
-// premise. "The Fake Account" and "Privacy" were originally investigation /
-// classification exercises, adapted here into choice scenarios. "The Scam"
-// was originally a series of escalating scam examples — condensed into one
-// scenario, with the other scam types named in the concept text rather than
-// built out individually. "Digital Detective" (open investigative
-// discussion) is folded into the concept text on "Privacy" rather than its
-// own scenario, since it has no natural choice structure.
+// Content authored from the user's curriculum design (2026-08-17), adapted
+// to the choice→consequence format (see leading notes in earlier revision
+// for what was adapted from investigation/classification exercises). Each
+// choice carries a `dcera` score and `reason`, added 2026-08-18 for
+// automatic scoring.
 
 const MODULE_DIGITAL_CITIZENSHIP = {
   id: "digital-citizenship",
@@ -26,13 +22,13 @@ const MODULE_DIGITAL_CITIZENSHIP = {
             "Which one actually helps the person in the video?"
           ],
           choices: [
-            { id: "A", text: "Like it." },
-            { id: "B", text: "Share it." },
-            { id: "C", text: "Comment on it." },
-            { id: "D", text: "Ignore it and scroll past." },
-            { id: "E", text: "Report the post." },
-            { id: "F", text: "Message the person in the video to tell them what's happening." },
-            { id: "G", text: "Ask the original poster to take it down." }
+            { id: "A", text: "Like it.", dcera: { D: 1, C: 1, E: 1, R: 2, A: 1 }, reason: "Feels passive, but it's a real signal that helps the post spread further." },
+            { id: "B", text: "Share it.", dcera: { D: 1, C: 1, E: 1, R: 1, A: 1 }, reason: "Directly multiplies the harm — the most damaging option on this list." },
+            { id: "C", text: "Comment on it.", dcera: { D: 1, C: 1, E: 1, R: 2, A: 1 }, reason: "Keeps the post active and visible, even without meaning any harm." },
+            { id: "D", text: "Ignore it and scroll past.", dcera: { D: 3, C: 2, E: 2, R: 4, A: 2 }, reason: "Doesn't spread it, but the person in it never learns you could have warned them." },
+            { id: "E", text: "Report the post.", dcera: { D: 4, C: 4, E: 3, R: 5, A: 3 }, reason: "Works against the spread instead of adding to it, even if the platform is slow." },
+            { id: "F", text: "Message the person in the video to tell them what's happening.", dcera: { D: 5, C: 5, E: 5, R: 4, A: 4 }, reason: "Centers the person actually affected and gives them the earliest chance to respond." },
+            { id: "G", text: "Ask the original poster to take it down.", dcera: { D: 4, C: 3, E: 4, R: 2, A: 4 }, reason: "Directly addresses the source, at the cost of putting yourself in the situation." }
           ],
           consequences: {
             A: "Liking feels harmless, but it's a signal to the algorithm that this content should be shown to more people — you've helped it spread without meaning to.",
@@ -55,11 +51,11 @@ const MODULE_DIGITAL_CITIZENSHIP = {
             "Who controls it once it's posted?"
           ],
           choices: [
-            { id: "A", text: "Post it to fit in." },
-            { id: "B", text: "Refuse and leave the group." },
-            { id: "C", text: "Refuse but stay in the group." },
-            { id: "D", text: "Suggest something else to post instead." },
-            { id: "E", text: "Screenshot the pressure and show a trusted adult." }
+            { id: "A", text: "Post it to fit in.", dcera: { D: 1, C: 1, E: 2, R: 1, A: 2 }, reason: "Fits in for a moment but hands away control of something you can't take back." },
+            { id: "B", text: "Refuse and leave the group.", dcera: { D: 3, C: 3, E: 2, R: 4, A: 2 }, reason: "Removes the pressure completely, at the cost of losing visibility into the group." },
+            { id: "C", text: "Refuse but stay in the group.", dcera: { D: 4, C: 4, E: 3, R: 4, A: 4 }, reason: "Holds the line without giving anything up, and keeps you able to see what happens next." },
+            { id: "D", text: "Suggest something else to post instead.", dcera: { D: 3, C: 3, E: 3, R: 3, A: 4 }, reason: "Sometimes redirects the pressure, though it isn't guaranteed to work." },
+            { id: "E", text: "Screenshot the pressure and show a trusted adult.", dcera: { D: 5, C: 5, E: 4, R: 5, A: 4 }, reason: "The only option that brings in outside help before anything is actually posted." }
           ],
           consequences: {
             A: "It gets a laugh in the moment. It also now exists somewhere outside your control, and you don't know who has it or where it ends up.",
@@ -80,11 +76,11 @@ const MODULE_DIGITAL_CITIZENSHIP = {
             "Who actually needs to know first?"
           ],
           choices: [
-            { id: "A", text: "Comment publicly calling it out immediately." },
-            { id: "B", text: "Screenshot everything as evidence before doing anything else." },
-            { id: "C", text: "Message the fake account directly to confront them." },
-            { id: "D", text: "Report it to the platform right away." },
-            { id: "E", text: "Tell your friend first, then decide together what to do." }
+            { id: "A", text: "Comment publicly calling it out immediately.", dcera: { D: 2, C: 1, E: 2, R: 1, A: 2 }, reason: "Alerts the account's owner, who can delete the evidence before anyone can act on it." },
+            { id: "B", text: "Screenshot everything as evidence before doing anything else.", dcera: { D: 5, C: 5, E: 3, R: 5, A: 4 }, reason: "Preserves proof before it can disappear — the foundation for whatever comes next." },
+            { id: "C", text: "Message the fake account directly to confront them.", dcera: { D: 2, C: 2, E: 2, R: 2, A: 2 }, reason: "Confirms you're watching, which can backfire into more harm just as easily as less." },
+            { id: "D", text: "Report it to the platform right away.", dcera: { D: 3, C: 3, E: 3, R: 3, A: 3 }, reason: "The formal channel, but usually slower than the situation calls for." },
+            { id: "E", text: "Tell your friend first, then decide together what to do.", dcera: { D: 4, C: 4, E: 5, R: 4, A: 4 }, reason: "Centers the person with the most at stake in deciding what happens next." }
           ],
           consequences: {
             A: "Calling it out publicly alerts the account's owner, who may delete it — and any evidence — before anyone can act on it.",
@@ -110,10 +106,10 @@ const MODULE_DIGITAL_CITIZENSHIP = {
             "What would a stranger assume about you from it?"
           ],
           choices: [
-            { id: "A", text: "Leave your profile exactly as it is — it's a fair reflection of you." },
-            { id: "B", text: "Clean up old posts and set your profile to private before applying." },
-            { id: "C", text: "Create a separate, more polished profile just for professional contexts." },
-            { id: "D", text: "Assume they won't actually check." }
+            { id: "A", text: "Leave your profile exactly as it is — it's a fair reflection of you.", dcera: { D: 3, C: 3, E: 4, R: 2, A: 3 }, reason: "Authentic, but leaves the impression entirely to chance and old context." },
+            { id: "B", text: "Clean up old posts and set your profile to private before applying.", dcera: { D: 3, C: 3, E: 2, R: 4, A: 3 }, reason: "Reduces risk, though a sudden change can itself look curated rather than genuine." },
+            { id: "C", text: "Create a separate, more polished profile just for professional contexts.", dcera: { D: 4, C: 4, E: 3, R: 4, A: 4 }, reason: "Common, low-risk, and deliberate — at the cost of maintaining two separate presences." },
+            { id: "D", text: "Assume they won't actually check.", dcera: { D: 1, C: 1, E: 1, R: 1, A: 1 }, reason: "Most recruiters do check — this leaves you with zero say over the story it tells." }
           ],
           consequences: {
             A: "Whatever impression it creates — good or bad — is genuinely yours. Some recruiters value authenticity; others will judge old posts out of context.",
@@ -133,11 +129,11 @@ const MODULE_DIGITAL_CITIZENSHIP = {
             "What would happen if you waited 24 hours before responding at all?"
           ],
           choices: [
-            { id: "A", text: "Click the link to see what happens." },
-            { id: "B", text: "Reply asking for more information." },
-            { id: "C", text: "Ignore and delete it." },
-            { id: "D", text: "Report it as spam / phishing." },
-            { id: "E", text: "Forward it to a friend to see what they think." }
+            { id: "A", text: "Click the link to see what happens.", dcera: { D: 1, C: 1, E: 2, R: 1, A: 2 }, reason: "The click itself is low-risk, but it walks you straight toward the page that isn't." },
+            { id: "B", text: "Reply asking for more information.", dcera: { D: 2, C: 2, E: 2, R: 1, A: 2 }, reason: "Confirms your inbox is active and watched, inviting more of the same." },
+            { id: "C", text: "Ignore and delete it.", dcera: { D: 4, C: 4, E: 3, R: 5, A: 3 }, reason: "The safest immediate outcome, though it does nothing to stop the next attempt." },
+            { id: "D", text: "Report it as spam / phishing.", dcera: { D: 5, C: 4, E: 4, R: 5, A: 4 }, reason: "Helps flag the pattern for others — the only option with an effect beyond your own inbox." },
+            { id: "E", text: "Forward it to a friend to see what they think.", dcera: { D: 2, C: 2, E: 3, R: 2, A: 3 }, reason: "A reasonable instinct to double-check, but it can just spread the same exposure." }
           ],
           consequences: {
             A: "The link leads to a page asking for your bank details 'to process the transfer.' Clicking alone rarely causes harm — entering information is where the real damage happens, and this page is designed to get you there.",
@@ -158,10 +154,10 @@ const MODULE_DIGITAL_CITIZENSHIP = {
             "What could someone figure out by combining all of them?"
           ],
           choices: [
-            { id: "A", text: "Include all of it — full transparency." },
-            { id: "B", text: "Include school and birthday only — feels harmless." },
-            { id: "C", text: "Include none of it — keep the bio generic." },
-            { id: "D", text: "Include location tagging on posts, but nothing else." }
+            { id: "A", text: "Include all of it — full transparency.", dcera: { D: 1, C: 1, E: 2, R: 1, A: 2 }, reason: "Each detail alone seems minor — combined, they're enough to locate and impersonate you." },
+            { id: "B", text: "Include school and birthday only — feels harmless.", dcera: { D: 2, C: 2, E: 2, R: 2, A: 2 }, reason: "Feels harmless, but it's a common combination used to guess account recovery answers." },
+            { id: "C", text: "Include none of it — keep the bio generic.", dcera: { D: 4, C: 4, E: 3, R: 5, A: 3 }, reason: "The most protected option, at the cost of being harder for real friends to find." },
+            { id: "D", text: "Include location tagging on posts, but nothing else.", dcera: { D: 1, C: 1, E: 2, R: 1, A: 2 }, reason: "The single highest-risk item on the list on its own — it says exactly where you are, live." }
           ],
           consequences: {
             A: "Individually, several of these seem harmless. Combined, they're enough for a stranger to know where to find you, when, and how to convincingly pretend to know you — the same reconstruction a 'digital detective' exercise uses to build a picture of a total stranger from public information alone.",

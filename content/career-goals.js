@@ -1,13 +1,11 @@
 // Module: Career & Goal-Setting
-// Content authored from the user's curriculum design (2026-08-17). Most of
-// Level 1 (Strengths, Values, Mythbusters, Reality Check) was originally an
-// open reflection/ranking/classification exercise with no branching choice —
-// each was adapted here into a single representative choice scenario. The
-// Values exercise in particular loses its real mechanic (rank 10 values down
-// to 5, then 3, then 1) and becomes a single "pick one" choice — the forced
-// elimination is named in the concept text instead of played out. "The
-// Career Decision" and "The Four-Year Future" were research/simulation
-// exercises, similarly condensed into single choice scenarios.
+// Content authored from the user's curriculum design (2026-08-17), adapted
+// to the choice→consequence format (see leading notes in earlier revision
+// for what was adapted from open reflection/ranking/classification
+// exercises). Each choice carries a `dcera` score and `reason`, added
+// 2026-08-18 for automatic scoring. For reflective scenarios (Strengths,
+// Values) there's no "wrong" pick — scores reflect the trade-off each
+// choice represents, not a right/wrong judgment.
 
 const MODULE_CAREER_GOALS = {
   id: "career-goals",
@@ -26,11 +24,11 @@ const MODULE_CAREER_GOALS = {
             "What comes easily to you that seems to be hard for others?"
           ],
           choices: [
-            { id: "A", text: "Explaining something complicated in a simple way." },
-            { id: "B", text: "Fixing or figuring out how something works." },
-            { id: "C", text: "Calming someone down or helping them feel understood." },
-            { id: "D", text: "Coming up with an idea nobody else thought of." },
-            { id: "E", text: "Organizing something chaotic into something that works." }
+            { id: "A", text: "Explaining something complicated in a simple way.", dcera: { D: 4, C: 3, E: 4, R: 2, A: 3 }, reason: "Communication strengths show up as an ability to make complexity usable for someone else." },
+            { id: "B", text: "Fixing or figuring out how something works.", dcera: { D: 4, C: 4, E: 2, R: 4, A: 3 }, reason: "Systems thinking shows up as noticing what will break before it does." },
+            { id: "C", text: "Calming someone down or helping them feel understood.", dcera: { D: 3, C: 3, E: 5, R: 2, A: 4 }, reason: "Emotional strengths show up as making people, not just tasks, the actual work." },
+            { id: "D", text: "Coming up with an idea nobody else thought of.", dcera: { D: 4, C: 2, E: 3, R: 1, A: 5 }, reason: "Creative strengths show up as comfort with an idea nobody else has tried yet." },
+            { id: "E", text: "Organizing something chaotic into something that works.", dcera: { D: 4, C: 4, E: 2, R: 4, A: 3 }, reason: "Structural strengths show up as turning something chaotic into something that actually works." }
           ],
           consequences: {
             A: "That's a teaching/communication strength — useful in far more careers than 'teacher.' Anywhere that needs someone to translate complexity, this matters.",
@@ -51,10 +49,16 @@ const MODULE_CAREER_GOALS = {
             "Is your first instinct here the one you'd actually stand by?"
           ],
           choices: [
-            { id: "A", text: "Money" }, { id: "B", text: "Freedom" }, { id: "C", text: "Security" },
-            { id: "D", text: "Creativity" }, { id: "E", text: "Status" }, { id: "F", text: "Helping people" },
-            { id: "G", text: "Adventure" }, { id: "H", text: "Family time" },
-            { id: "I", text: "Intellectual challenge" }, { id: "J", text: "Social impact" }
+            { id: "A", text: "Money", dcera: { D: 3, C: 4, E: 1, R: 4, A: 2 }, reason: "Protects financial certainty, at the cost of flexibility and passion." },
+            { id: "B", text: "Freedom", dcera: { D: 3, C: 2, E: 2, R: 1, A: 5 }, reason: "Protects control over your time, at the cost of stability." },
+            { id: "C", text: "Security", dcera: { D: 3, C: 4, E: 2, R: 5, A: 1 }, reason: "Protects predictability, at the cost of upside and growth." },
+            { id: "D", text: "Creativity", dcera: { D: 3, C: 1, E: 3, R: 1, A: 5 }, reason: "Protects the chance to make something new, at the cost of stability." },
+            { id: "E", text: "Status", dcera: { D: 2, C: 2, E: 1, R: 2, A: 2 }, reason: "Protects recognition, at the cost of asking who you're really trying to impress." },
+            { id: "F", text: "Helping people", dcera: { D: 4, C: 3, E: 5, R: 2, A: 3 }, reason: "Protects impact on others, at the cost of personal gain and sustainability." },
+            { id: "G", text: "Adventure", dcera: { D: 2, C: 2, E: 2, R: 1, A: 5 }, reason: "Protects novelty, at the cost of routine and predictability." },
+            { id: "H", text: "Family time", dcera: { D: 3, C: 3, E: 5, R: 3, A: 2 }, reason: "Protects presence with people who matter, at the cost of ambition." },
+            { id: "I", text: "Intellectual challenge", dcera: { D: 4, C: 2, E: 2, R: 1, A: 5 }, reason: "Protects constant growth, at the cost of comfort and certainty." },
+            { id: "J", text: "Social impact", dcera: { D: 4, C: 3, E: 5, R: 2, A: 3 }, reason: "Protects collective good, at the cost of a clear way to measure it." }
           ],
           consequences: {
             A: "You'd trade flexibility and passion for financial certainty — worth asking what you'd do with the security once you had it.",
@@ -80,9 +84,9 @@ const MODULE_CAREER_GOALS = {
             "Can you think of a counter-example either way?"
           ],
           choices: [
-            { id: "A", text: "Fact — good marks are the clearest predictor of success." },
-            { id: "B", text: "Myth — marks have nothing to do with real-world success." },
-            { id: "C", text: "Depends — on what kind of success, and in what field." }
+            { id: "A", text: "Fact — good marks are the clearest predictor of success.", dcera: { D: 2, C: 2, E: 2, R: 2, A: 1 }, reason: "Treats marks as settled proof of success, which closes off paths that don't depend on them." },
+            { id: "B", text: "Myth — marks have nothing to do with real-world success.", dcera: { D: 2, C: 2, E: 2, R: 2, A: 1 }, reason: "Dismisses marks entirely, which ignores the real doors they do open." },
+            { id: "C", text: "Depends — on what kind of success, and in what field.", dcera: { D: 5, C: 5, E: 3, R: 3, A: 5 }, reason: "The least satisfying answer, and the most accurate one — success depends on what you're measuring." }
           ],
           consequences: {
             A: "Marks predict certain things well — getting into certain programmes, certain jobs — and almost nothing about others, like people skills, resilience, or timing. Treating it as settled fact closes off a lot of paths early.",
@@ -101,10 +105,10 @@ const MODULE_CAREER_GOALS = {
             "What are you actually willing to give up for it?"
           ],
           choices: [
-            { id: "A", text: "One with predictable hours and low stress, even if the pay is modest." },
-            { id: "B", text: "One with high income, even if the hours are long and unpredictable." },
-            { id: "C", text: "One with constant learning and creative challenge, even if job security is lower." },
-            { id: "D", text: "One with strong social interaction and teamwork, even if it means less independence." }
+            { id: "A", text: "One with predictable hours and low stress, even if the pay is modest.", dcera: { D: 3, C: 4, E: 2, R: 5, A: 2 }, reason: "Optimizes for predictability, pointing toward stable, service-oriented careers." },
+            { id: "B", text: "One with high income, even if the hours are long and unpredictable.", dcera: { D: 3, C: 3, E: 2, R: 2, A: 3 }, reason: "Optimizes for upside, pointing toward high-growth, high-stress fields." },
+            { id: "C", text: "One with constant learning and creative challenge, even if job security is lower.", dcera: { D: 3, C: 2, E: 3, R: 1, A: 5 }, reason: "Optimizes for growth, pointing toward research and fast-moving fields." },
+            { id: "D", text: "One with strong social interaction and teamwork, even if it means less independence.", dcera: { D: 3, C: 3, E: 5, R: 3, A: 3 }, reason: "Optimizes for connection, pointing toward people-first, collaborative roles." }
           ],
           consequences: {
             A: "This points toward roles that trade upside for predictability — many operations, government, and stable-service careers optimize for exactly this.",
@@ -129,10 +133,10 @@ const MODULE_CAREER_GOALS = {
             "What conversation is this choice avoiding?"
           ],
           choices: [
-            { id: "A", text: "Follow family expectations — study Engineering." },
-            { id: "B", text: "Follow personal interest — pursue UX/Product Design directly." },
-            { id: "C", text: "Study Engineering, but actively build UX/design skills on the side." },
-            { id: "D", text: "Have an honest conversation with family before deciding anything." }
+            { id: "A", text: "Follow family expectations — study Engineering.", dcera: { D: 2, C: 2, E: 3, R: 4, A: 1 }, reason: "The path of least resistance now, and the one most likely to need revisiting later." },
+            { id: "B", text: "Follow personal interest — pursue UX/Product Design directly.", dcera: { D: 3, C: 2, E: 2, R: 2, A: 4 }, reason: "The path of most resistance now, and the one most likely to feel right sooner." },
+            { id: "C", text: "Study Engineering, but actively build UX/design skills on the side.", dcera: { D: 2, C: 2, E: 2, R: 3, A: 3 }, reason: "Hedges the bet, but doing both fully is harder than it looks — something usually gives." },
+            { id: "D", text: "Have an honest conversation with family before deciding anything.", dcera: { D: 5, C: 5, E: 5, R: 4, A: 5 }, reason: "The only option that addresses the actual problem, which is a conversation, not a course." }
           ],
           consequences: {
             A: "It's the path of least resistance now, and the one most likely to create a harder conversation two or three years in, once the mismatch is clearer.",
@@ -152,9 +156,9 @@ const MODULE_CAREER_GOALS = {
             "What could realistically change that you're not accounting for?"
           ],
           choices: [
-            { id: "A", text: "A well-established, in-demand field (e.g. traditional engineering)." },
-            { id: "B", text: "An emerging field with less certainty (e.g. a new tech specialization)." },
-            { id: "C", text: "A passion-first path with an unclear job market (e.g. the arts)." }
+            { id: "A", text: "A well-established, in-demand field (e.g. traditional engineering).", dcera: { D: 3, C: 3, E: 2, R: 5, A: 2 }, reason: "Chooses stability, and gets tested on how much control that stability actually gives you." },
+            { id: "B", text: "An emerging field with less certainty (e.g. a new tech specialization).", dcera: { D: 3, C: 3, E: 2, R: 2, A: 5 }, reason: "Chooses growth potential, and gets tested by exactly the disruption that comes with it." },
+            { id: "C", text: "A passion-first path with an unclear job market (e.g. the arts).", dcera: { D: 3, C: 2, E: 3, R: 1, A: 4 }, reason: "Chooses meaning over certainty, and gets tested on whether the work matches the passion." }
           ],
           consequences: {
             A: "Year 1–2 go as expected. Year 3: your preferred specialization becomes significantly more expensive to pursue further. Year 4: the stability is real, but you notice how many of your decisions have started being made for you by the field's own momentum, not by you.",
@@ -173,8 +177,8 @@ const MODULE_CAREER_GOALS = {
             "What would you regret not trying?"
           ],
           choices: [
-            { id: "A", text: "Take Option A — the large company offer." },
-            { id: "B", text: "Take Option B — the small company offer." }
+            { id: "A", text: "Take Option A — the large company offer.", dcera: { D: 3, C: 3, E: 2, R: 4, A: 2 }, reason: "Optimizes for income and security, at a real cost to autonomy and time." },
+            { id: "B", text: "Take Option B — the small company offer.", dcera: { D: 3, C: 3, E: 2, R: 2, A: 4 }, reason: "Optimizes for growth and autonomy, at a real cost to income." }
           ],
           consequences: {
             A: "The income difference is real and immediate — but so are the long hours and limited say over your own work, and those compound in ways salary alone doesn't capture.",
@@ -192,9 +196,9 @@ const MODULE_CAREER_GOALS = {
             "What would you tell a friend in this exact position?"
           ],
           choices: [
-            { id: "A", text: "Drop the goal entirely." },
-            { id: "B", text: "Try again — repeat and re-attempt." },
-            { id: "C", text: "Find an alternative pathway toward the same broader goal." }
+            { id: "A", text: "Drop the goal entirely.", dcera: { D: 2, C: 2, E: 2, R: 3, A: 2 }, reason: "A clean ending, but only truthful if the goal itself has actually changed, not just the mood." },
+            { id: "B", text: "Try again — repeat and re-attempt.", dcera: { D: 3, C: 3, E: 3, R: 2, A: 2 }, reason: "Keeps the original plan alive, at a real cost of time and pressure." },
+            { id: "C", text: "Find an alternative pathway toward the same broader goal.", dcera: { D: 4, C: 4, E: 3, R: 3, A: 5 }, reason: "Takes the most creativity to find, and often leads somewhere better than the original plan." }
           ],
           consequences: {
             A: "It closes this chapter cleanly, but only if the goal itself is genuinely no longer what you want — not just what feels easiest to say after a hard result.",
