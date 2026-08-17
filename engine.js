@@ -20,6 +20,7 @@ const DCERA_DIMS = [
 ];
 
 const BEAT_LABELS = ["Hook", "Individual", "Team talk", "Choices", "Reveal", "Reflect", "Takeaway"];
+const SHEET_URL_KEY = "hsl_sheet_url";
 
 let state = null;
 let timerInterval = null;
@@ -30,6 +31,8 @@ function freshState() {
     className: "",
     level: "L1",
     moduleId: AVAILABLE_MODULES[0].id,
+    sheetUrl: localStorage.getItem(SHEET_URL_KEY) || "",
+    syncStatus: "idle", // idle | saving | saved | error
     teams: [],
     nextTeamNum: 1,
     scenarioIndex: 0,
@@ -141,6 +144,17 @@ function renderLauncher() {
       </div>
     </div>
 
+    <details class="card" id="syncSettings">
+      <summary style="cursor:pointer; font-weight:700;">Save session history to Google Sheet (optional)</summary>
+      <div class="col" style="margin-top:1rem;">
+        <div class="field">
+          <label for="sheetUrl">Google Apps Script Web App URL</label>
+          <input type="text" id="sheetUrl" placeholder="https://script.google.com/macros/s/.../exec" value="${state.sheetUrl}">
+        </div>
+        <p style="font-size:0.85rem; color:var(--ink-soft);">Leave blank to skip saving — sessions still work fully offline, just without a persistent history.</p>
+      </div>
+    </details>
+
     <div class="row" style="margin-top:1rem;">
       <div class="spacer"></div>
       <button class="btn btn-primary" id="startBtn" style="min-width:220px;">Start session</button>
@@ -150,6 +164,10 @@ function renderLauncher() {
   wrap.querySelector("#className").addEventListener("input", e => state.className = e.target.value);
   wrap.querySelector("#level").addEventListener("change", e => state.level = e.target.value);
   wrap.querySelector("#module").addEventListener("change", e => state.moduleId = e.target.value);
+  wrap.querySelector("#sheetUrl").addEventListener("change", e => {
+    state.sheetUrl = e.target.value.trim();
+    localStorage.setItem(SHEET_URL_KEY, state.sheetUrl);
+  });
   wrap.querySelector("#addTeamBtn").addEventListener("click", () => {
     const name = prompt("Team name?", `Team ${state.nextTeamNum}`);
     if (!name) return;
@@ -432,6 +450,47 @@ function avgDcera(teamId) {
   return avg;
 }
 
+function buildSyncPayload() {
+  return {
+    timestamp: new Date().toISOString(),
+    className: state.className || "Unnamed class",
+    module: currentModule().title,
+    level: currentModule().levels[state.level].label,
+    rows: state.log.map(entry => {
+      const scenario = currentScenarios().find(s => s.id === entry.scenarioId);
+      const team = state.teams.find(t => t.id === entry.teamId);
+      return {
+        team: team.name,
+        scenario: scenario.title,
+        choice: entry.choiceId,
+        D: entry.dcera.D, C: entry.dcera.C, E: entry.dcera.E, R: entry.dcera.R, A: entry.dcera.A
+      };
+    })
+  };
+}
+
+function syncStatusLabel() {
+  return {
+    idle: "",
+    saving: "Saving…",
+    saved: "Saved to Google Sheet ✓",
+    error: "Couldn't save — check the sync URL on the launcher and your connection."
+  }[state.syncStatus];
+}
+
+function syncSession() {
+  state.syncStatus = "saving";
+  render();
+  fetch(state.sheetUrl, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(buildSyncPayload())
+  })
+    .then(res => { if (!res.ok) throw new Error("bad response"); state.syncStatus = "saved"; })
+    .catch(() => { state.syncStatus = "error"; })
+    .finally(render);
+}
+
 function renderDebrief() {
   const wrap = el(`<div class="screen">
     ${sessionHeader()}
@@ -462,14 +521,18 @@ function renderDebrief() {
         </tbody>
       </table>
     </div>
-    <div class="row no-print" style="margin-top:1rem;">
+    <div class="row no-print" style="margin-top:1rem; align-items:center;">
       <button class="btn" id="print">Print / export summary</button>
+      ${state.sheetUrl ? `<button class="btn" id="sync" ${state.syncStatus === "saving" ? "disabled" : ""}>${state.syncStatus === "saved" ? "Saved ✓" : "Save to Google Sheet"}</button>` : ""}
+      <span style="font-size:0.85rem; color:${state.syncStatus === "error" ? "var(--danger)" : "var(--ink-soft)"};">${syncStatusLabel()}</span>
       <div class="spacer"></div>
       <button class="btn btn-primary" id="restart" style="min-width:220px;">New session</button>
     </div>
   </div>`);
   wrap.querySelector("#print").addEventListener("click", () => window.print());
   wrap.querySelector("#restart").addEventListener("click", () => init());
+  const syncBtn = wrap.querySelector("#sync");
+  if (syncBtn) syncBtn.addEventListener("click", syncSession);
   return wrap;
 }
 
