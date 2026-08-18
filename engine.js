@@ -27,6 +27,13 @@ const SHEET_SELECTED_KEY = "hsl_sheet_selected_id";
 const TEAM_COLORS = ["#F43F5E", "#8B5CF6", "#22D3A5", "#FBBF24", "#3B82F6", "#FB7185", "#34D399", "#F472B6", "#60A5FA", "#C084FC"];
 const REDUCE_MOTION = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+// Baked-in default so the app needs zero setup on any classroom computer.
+// This URL only accepts writes (appends a row) — it can't read or expose
+// existing sheet data back to the caller.
+const DEFAULT_SHEETS = [
+  { id: "default", label: "Human Systems Lab — Sessions", url: "https://script.google.com/macros/s/AKfycbzsNFMnE1HcL0uSS1RJxSeXN6UCAjZSpX_YKzlxQLVJYM6vV0sJv4aufHnchvFrsV8xKQ/exec" }
+];
+
 let state = null;
 let timerInterval = null;
 
@@ -40,6 +47,10 @@ function loadSheetUrls() {
     const migrated = [{ id: "legacy", label: "Sessions Sheet", url: legacy }];
     localStorage.setItem(SHEET_URLS_KEY, JSON.stringify(migrated));
     return migrated;
+  }
+  if (DEFAULT_SHEETS.length) {
+    localStorage.setItem(SHEET_URLS_KEY, JSON.stringify(DEFAULT_SHEETS));
+    return DEFAULT_SHEETS.slice();
   }
   return [];
 }
