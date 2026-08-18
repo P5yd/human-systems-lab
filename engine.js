@@ -30,7 +30,7 @@ let timerInterval = null;
 
 function freshState() {
   return {
-    screen: "launcher",
+    screen: "home",
     className: "",
     level: "L1",
     moduleId: AVAILABLE_MODULES[0].id,
@@ -48,6 +48,12 @@ function freshState() {
 
 function init() {
   state = freshState();
+  render();
+}
+
+function newSession() {
+  state = freshState();
+  state.screen = "launcher"; // trainer already knows the app — skip straight to setup
   render();
 }
 
@@ -73,6 +79,7 @@ function render() {
   const app = document.getElementById("app");
   app.innerHTML = "";
   const map = {
+    home: renderHome,
     launcher: renderLauncher,
     hook: renderHook,
     think: renderThink,
@@ -125,6 +132,42 @@ function sessionHeader(sub) {
   </div>
   ${scoreboardStrip()}
   ${sub || ""}`;
+}
+
+// ---------- HOME ----------
+
+function renderHome() {
+  const wrap = el(`<div class="screen home-screen">
+    <span class="eyebrow">Human Systems Lab</span>
+    <h1>Make the call. See what happens.</h1>
+    <p class="lead">This is a life-skills decision lab, not a lecture. Your team gets a real situation — a rumour, a budget, a viral post, a career choice — and has to decide what to do. There's no briefing first. You choose, then find out what it actually leads to.</p>
+
+    <h3 style="margin-top:0.6rem;">How a round works</h3>
+    <div class="steps-grid">
+      <div class="step-card"><span class="step-num">1</span><h4>See the situation</h4><p>One scenario, shown once, for every team at the same time.</p></div>
+      <div class="step-card"><span class="step-num">2</span><h4>Think, then talk</h4><p>Decide on your own for a minute, then argue it out as a team.</p></div>
+      <div class="step-card"><span class="step-num">3</span><h4>Lock in your answer</h4><p>Every team answers the same question — no do-overs once it's in.</p></div>
+      <div class="step-card"><span class="step-num">4</span><h4>See what happens</h4><p>Your choice plays out, and so does everyone else's.</p></div>
+      <div class="step-card"><span class="step-num">5</span><h4>Get scored, with reasons</h4><p>Your DCERA score is revealed instantly, with why — not just a number.</p></div>
+    </div>
+
+    <h3 style="margin-top:0.6rem;">What DCERA actually measures</h3>
+    <p class="lead" style="font-size:1rem;">Every choice your team makes is scored on five dimensions — not "right or wrong," but how well you handled the trade-offs. There's no perfect score to hunt for; the goal is getting sharper on all five over a term.</p>
+    <div class="dcera-legend">
+      <div class="legend-card"><span class="legend-letter">D</span><h4>Decision quality</h4><p>Did you address the real problem, not just react to it?</p></div>
+      <div class="legend-card"><span class="legend-letter">C</span><h4>Consequence awareness</h4><p>Did you think about what happens next — not just right now?</p></div>
+      <div class="legend-card"><span class="legend-letter">E</span><h4>Empathy</h4><p>Did you consider how it affects everyone else involved?</p></div>
+      <div class="legend-card"><span class="legend-letter">R</span><h4>Risk assessment</h4><p>Did you weigh what could realistically go wrong?</p></div>
+      <div class="legend-card"><span class="legend-letter">A</span><h4>Adaptability</h4><p>Could you adjust if the situation changed on you?</p></div>
+    </div>
+
+    <div class="row" style="margin-top:1.5rem;">
+      <div class="spacer"></div>
+      <button class="btn btn-primary" id="enter" style="min-width:240px;">Start a session</button>
+    </div>
+  </div>`);
+  wrap.querySelector("#enter").addEventListener("click", () => { state.screen = "launcher"; render(); });
+  return wrap;
 }
 
 // ---------- LAUNCHER ----------
@@ -605,7 +648,7 @@ function renderDebrief() {
     <div class="confetti-layer" id="confettiLayer"></div>
   </div>`);
   wrap.querySelector("#print").addEventListener("click", () => window.print());
-  wrap.querySelector("#restart").addEventListener("click", () => init());
+  wrap.querySelector("#restart").addEventListener("click", () => newSession());
   const syncBtn = wrap.querySelector("#sync");
   if (syncBtn) syncBtn.addEventListener("click", syncSession);
   if (winners.length) spawnConfetti(wrap.querySelector("#confettiLayer"));
