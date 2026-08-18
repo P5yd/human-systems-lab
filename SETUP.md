@@ -51,3 +51,9 @@ That's it — it's saved in your browser, so you only need to paste it once per 
 ## If you ever need to redeploy
 
 If you edit the script later, use **Deploy → Manage deployments → Edit (pencil icon) → New version** rather than creating a brand-new deployment — that way the URL you already pasted into the app keeps working.
+
+## Troubleshooting
+
+**Getting a "Page not found" or login-page response when testing the URL directly:** double-check **Who has access** is set to exactly **Anyone** (not "Anyone with Google account" or "Only myself") under Deploy → Manage deployments → Edit. This is the most common cause of the sync silently failing.
+
+**Testing the URL yourself:** don't test it with `curl` or similar command-line tools — Google's servers appear to reject automated non-browser POST requests to Apps Script web apps even when access is correctly set to "Anyone." A real browser's request (which is what the app itself sends) works fine even when a `curl` test to the same URL returns a 405. Test it by actually using the app and clicking "Save to Google Sheet" instead.
