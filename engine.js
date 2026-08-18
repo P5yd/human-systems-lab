@@ -21,20 +21,45 @@ const DCERA_DIMS = [
 ];
 
 const BEAT_LABELS = ["Hook", "Think", "Discuss", "Answer", "Results", "Reflect", "Takeaway"];
-const SHEET_URL_KEY = "hsl_sheet_url";
+const SHEET_URL_KEY = "hsl_sheet_url"; // legacy single-URL key, migrated on load
+const SHEET_URLS_KEY = "hsl_sheet_urls";
+const SHEET_SELECTED_KEY = "hsl_sheet_selected_id";
 const TEAM_COLORS = ["#F43F5E", "#8B5CF6", "#22D3A5", "#FBBF24", "#3B82F6", "#FB7185", "#34D399", "#F472B6", "#60A5FA", "#C084FC"];
 const REDUCE_MOTION = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 let state = null;
 let timerInterval = null;
 
+function loadSheetUrls() {
+  try {
+    const raw = localStorage.getItem(SHEET_URLS_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) { /* fall through to migration */ }
+  const legacy = localStorage.getItem(SHEET_URL_KEY);
+  if (legacy) {
+    const migrated = [{ id: "legacy", label: "Sessions Sheet", url: legacy }];
+    localStorage.setItem(SHEET_URLS_KEY, JSON.stringify(migrated));
+    return migrated;
+  }
+  return [];
+}
+function saveSheetUrls(list) { localStorage.setItem(SHEET_URLS_KEY, JSON.stringify(list)); }
+function resolveSheetUrl(sheetUrls, selectedId) {
+  const found = sheetUrls.find(s => s.id === selectedId);
+  return found ? found.url : "";
+}
+
 function freshState() {
+  const sheetUrls = loadSheetUrls();
+  const selectedSheetId = localStorage.getItem(SHEET_SELECTED_KEY) || (sheetUrls[0] && sheetUrls[0].id) || "";
   return {
     screen: "home",
     className: "",
     level: "L1",
     moduleId: AVAILABLE_MODULES[0].id,
-    sheetUrl: localStorage.getItem(SHEET_URL_KEY) || "",
+    sheetUrls,
+    selectedSheetId,
+    sheetUrl: resolveSheetUrl(sheetUrls, selectedSheetId),
     syncStatus: "idle",
     teams: [],
     nextTeamNum: 1,
@@ -204,14 +229,33 @@ function renderLauncher() {
       </div>
     </div>
 
-    <details class="card" id="syncSettings">
+    <details class="card" id="syncSettings" ${state.sheetUrls.length ? "open" : ""}>
       <summary style="cursor:pointer; font-weight:700;">Save session history to Google Sheet (optional)</summary>
       <div class="col" style="margin-top:1rem;">
         <div class="field">
-          <label for="sheetUrl">Google Apps Script Web App URL</label>
-          <input type="text" id="sheetUrl" placeholder="https://script.google.com/macros/s/.../exec" value="${state.sheetUrl}">
+          <label for="sheetUrlSelect">Google Sheet</label>
+          <select id="sheetUrlSelect">
+            <option value="">— None (don't save) —</option>
+            ${state.sheetUrls.map(s => `<option value="${s.id}" ${s.id === state.selectedSheetId ? "selected" : ""}>${s.label}</option>`).join("")}
+            <option value="__add__">+ Add new Google Sheet…</option>
+          </select>
         </div>
-        <p style="font-size:0.85rem; color:var(--ink-soft);">Leave blank to skip saving — sessions still work fully offline, just without a persistent history.</p>
+        <div class="col" id="addSheetForm" style="display:none; gap:0.7rem; background:var(--surface-2); border-radius:12px; padding:1rem;">
+          <div class="field">
+            <label for="newSheetLabel">Label</label>
+            <input type="text" id="newSheetLabel" placeholder="e.g. Grade 9 Sessions">
+          </div>
+          <div class="field">
+            <label for="newSheetUrl">Apps Script Web App URL</label>
+            <input type="text" id="newSheetUrl" placeholder="https://script.google.com/macros/s/.../exec">
+          </div>
+          <div class="row">
+            <button class="btn btn-primary" id="saveNewSheet">Save this Sheet</button>
+            <button class="btn btn-ghost" id="cancelNewSheet">Cancel</button>
+          </div>
+        </div>
+        ${state.selectedSheetId ? `<button class="btn btn-ghost" id="removeSheet" style="align-self:flex-start; padding-left:0;">Remove this saved Sheet</button>` : ""}
+        <p style="font-size:0.85rem; color:var(--ink-soft);">Choose "None" to skip saving — sessions still work fully offline, just without a persistent history.</p>
       </div>
     </details>
 
@@ -224,10 +268,43 @@ function renderLauncher() {
   wrap.querySelector("#className").addEventListener("input", e => state.className = e.target.value);
   wrap.querySelector("#level").addEventListener("change", e => state.level = e.target.value);
   wrap.querySelector("#module").addEventListener("change", e => state.moduleId = e.target.value);
-  wrap.querySelector("#sheetUrl").addEventListener("change", e => {
-    state.sheetUrl = e.target.value.trim();
-    localStorage.setItem(SHEET_URL_KEY, state.sheetUrl);
+  const sheetSelect = wrap.querySelector("#sheetUrlSelect");
+  const addForm = wrap.querySelector("#addSheetForm");
+  sheetSelect.addEventListener("change", e => {
+    if (e.target.value === "__add__") {
+      addForm.style.display = "flex";
+      e.target.value = state.selectedSheetId; // don't leave "+ Add new" selected
+      return;
+    }
+    state.selectedSheetId = e.target.value;
+    state.sheetUrl = resolveSheetUrl(state.sheetUrls, state.selectedSheetId);
+    localStorage.setItem(SHEET_SELECTED_KEY, state.selectedSheetId);
+    render();
   });
+  wrap.querySelector("#saveNewSheet").addEventListener("click", () => {
+    const label = wrap.querySelector("#newSheetLabel").value.trim();
+    const url = wrap.querySelector("#newSheetUrl").value.trim();
+    if (!url) { alert("Paste the Apps Script Web App URL first."); return; }
+    const entry = { id: "s" + Date.now() + Math.random().toString(36).slice(2, 6), label: label || url, url };
+    state.sheetUrls.push(entry);
+    saveSheetUrls(state.sheetUrls);
+    state.selectedSheetId = entry.id;
+    state.sheetUrl = entry.url;
+    localStorage.setItem(SHEET_SELECTED_KEY, state.selectedSheetId);
+    render();
+  });
+  wrap.querySelector("#cancelNewSheet").addEventListener("click", () => render());
+  const removeBtn = wrap.querySelector("#removeSheet");
+  if (removeBtn) {
+    removeBtn.addEventListener("click", () => {
+      state.sheetUrls = state.sheetUrls.filter(s => s.id !== state.selectedSheetId);
+      saveSheetUrls(state.sheetUrls);
+      state.selectedSheetId = state.sheetUrls[0] ? state.sheetUrls[0].id : "";
+      state.sheetUrl = resolveSheetUrl(state.sheetUrls, state.selectedSheetId);
+      localStorage.setItem(SHEET_SELECTED_KEY, state.selectedSheetId);
+      render();
+    });
+  }
   wrap.querySelector("#addTeamBtn").addEventListener("click", () => {
     const name = prompt("Team name?", `Team ${state.nextTeamNum}`);
     if (!name) return;
