@@ -14,7 +14,7 @@ const MODULE_SWOT_ANALYSIS = {
         {
           id: "before-the-big-match",
           title: "Before the Big Match",
-          hook: "You're leading your team in an inter-school match next week. Strength: a fast, well-drilled defense. Weakness: poor fitness and weak communication. Opportunity: the rival's star player is injured. Threat: your own key player is nursing a knee issue.",
+          hook: "You're leading your team in an inter-school match next week.<br><br><b>Strength:</b> a fast, well-drilled defense.<br><b>Weakness:</b> poor fitness and weak communication.<br><b>Opportunity:</b> the rival's star player is injured.<br><b>Threat:</b> your own key player is nursing a knee issue.",
           predictionPrompts: [
             "What happens if you ignore the threat to chase the opportunity?",
             "What happens if you fix the weakness but never use the strength?"
@@ -39,7 +39,7 @@ const MODULE_SWOT_ANALYSIS = {
         {
           id: "the-exam-youre-worried-about",
           title: "The Exam You're Worried About",
-          hook: "A big exam is in two weeks. Strength: you're quick at math. Weakness: you freeze under time pressure. Opportunity: the teacher posted last year's paper. Threat: two other assignments are due the same week.",
+          hook: "A big exam is in two weeks.<br><br><b>Strength:</b> you're quick at math.<br><b>Weakness:</b> you freeze under time pressure.<br><b>Opportunity:</b> the teacher posted last year's paper.<br><b>Threat:</b> two other assignments are due the same week.",
           predictionPrompts: [
             "Which of these four is actually in your control right now?",
             "What happens if you run out of time before addressing all of them?"
@@ -64,7 +64,7 @@ const MODULE_SWOT_ANALYSIS = {
         {
           id: "the-club-you-want-to-start",
           title: "The Club You Want to Start",
-          hook: "You want to start a coding club. Strength: you already code, and three friends are interested. Weakness: you've never organized anything before. Opportunity: the school is funding new clubs this term. Threat: a rival robotics club already has senior students' attention.",
+          hook: "You want to start a coding club.<br><br><b>Strength:</b> you already code, and three friends are interested.<br><b>Weakness:</b> you've never organized anything before.<br><b>Opportunity:</b> the school is funding new clubs this term.<br><b>Threat:</b> a rival robotics club already has senior students' attention.",
           predictionPrompts: [
             "What's the actual bottleneck to this club existing at all?",
             "What happens if you wait too long to apply for funding?"
@@ -94,7 +94,7 @@ const MODULE_SWOT_ANALYSIS = {
         {
           id: "the-college-application",
           title: "The College Application",
-          hook: "You're choosing where to apply. Strength: strong grades in science. Weakness: a thin extracurricular record. Opportunity: a new scholarship for your intended major just opened. Threat: application deadlines are tighter this year than usual.",
+          hook: "You're choosing where to apply.<br><br><b>Strength:</b> strong grades in science.<br><b>Weakness:</b> a thin extracurricular record.<br><b>Opportunity:</b> a new scholarship for your intended major just opened.<br><b>Threat:</b> application deadlines are tighter this year than usual.",
           predictionPrompts: [
             "What can you actually still change before the deadline?",
             "What's outside your control no matter what you do?"
@@ -119,7 +119,7 @@ const MODULE_SWOT_ANALYSIS = {
         {
           id: "the-startup-idea",
           title: "The Startup Idea",
-          hook: "A friend pitches you a startup idea: a delivery app for small local shops. Strength: you both know how to build the app. Weakness: neither of you has run a business before. Opportunity: no local competitor exists yet. Threat: a national chain is rumored to be planning the same thing.",
+          hook: "A friend pitches you a startup idea: a delivery app for small local shops.<br><br><b>Strength:</b> you both know how to build the app.<br><b>Weakness:</b> neither of you has run a business before.<br><b>Opportunity:</b> no local competitor exists yet.<br><b>Threat:</b> a national chain is rumored to be planning the same thing.",
           predictionPrompts: [
             "What happens if the rumored competitor is real, and you wait?",
             "What happens if it's not real, and you rush?"
@@ -144,7 +144,7 @@ const MODULE_SWOT_ANALYSIS = {
         {
           id: "the-job-offer",
           title: "The Job Offer",
-          hook: "You've been offered an internship. Strength: it's exactly in your field of interest. Weakness: it pays very little and you'd need to relocate. Opportunity: the company is growing fast and hiring aggressively. Threat: the offer expires in 48 hours.",
+          hook: "You've been offered an internship.<br><br><b>Strength:</b> it's exactly in your field of interest.<br><b>Weakness:</b> it pays very little and you'd need to relocate.<br><b>Opportunity:</b> the company is growing fast and hiring aggressively.<br><b>Threat:</b> the offer expires in 48 hours.",
           predictionPrompts: [
             "What's actually reversible about this decision, and what isn't?",
             "What information would you want that you don't currently have?"
