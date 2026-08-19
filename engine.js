@@ -433,10 +433,10 @@ function renderThink() {
 function renderDiscuss() {
   const wrap = el(`<div class="screen">
     ${sessionHeader(progressDots(2))}
-    <h2>Team discussion — up to 8 minutes</h2>
+    <h2>Team discussion — up to 2 minutes</h2>
     <p class="lead">Each team talks it over and settles on one answer. When you're ready, every team locks in their answer on the next screen.</p>
     <div class="timer-row">
-      <div class="timer" id="timerDisplay">8:00</div>
+      <div class="timer" id="timerDisplay">2:00</div>
       <div class="timer-track"><div class="timer-fill" id="timerBar" style="width:100%;"></div></div>
     </div>
     <div class="row" style="align-items:center;">
@@ -445,7 +445,7 @@ function renderDiscuss() {
       <button class="btn btn-primary" id="next" style="min-width:200px;">Everyone answer now</button>
     </div>
   </div>`);
-  mountTimer(wrap, 480);
+  mountTimer(wrap, 120);
   const go = () => stopAndGo(() => {
     state.activeTeamIndex = 0;
     state.pendingAnswers = {};
