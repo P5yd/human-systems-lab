@@ -101,17 +101,19 @@ const MODULE_RELATIONSHIPS_RESPONSIBILITY = {
             { id: "B", text: "Say no clearly, without over-explaining.", dcera: { D: 5, C: 5, E: 3, R: 5, A: 4 }, reason: "A clear no, without justifying it, is the option that actually protects you — and it's more respected than it feels like it will be." },
             { id: "C", text: "Ask why it matters to them so much.", dcera: { D: 4, C: 4, E: 3, R: 4, A: 4 }, reason: "Turns 'everyone does it' into something specific and checkable, instead of accepting it as a given." },
             { id: "D", text: "Change the subject and hope they drop it.", dcera: { D: 2, C: 2, E: 2, R: 2, A: 2 }, reason: "Avoids the moment without resolving it, which usually means it returns." },
-            { id: "E", text: "Send a joke instead of an actual answer.", dcera: { D: 2, C: 2, E: 2, R: 2, A: 3 }, reason: "Deflects without deciding — the question doesn't go away just because it wasn't answered directly." }
+            { id: "E", text: "Send a joke instead of an actual answer.", dcera: { D: 2, C: 2, E: 2, R: 2, A: 3 }, reason: "Deflects without deciding — the question doesn't go away just because it wasn't answered directly." },
+            { id: "F", text: "Tell a parent, teacher, or counselor about the pressure you're getting.", dcera: { D: 5, C: 5, E: 3, R: 5, A: 4 }, reason: "Pressure like this can escalate, and it's exactly the kind of thing a trusted adult can help you handle — not something to manage alone." }
           ],
           consequences: {
-            A: "It's sent, and now something you weren't comfortable with exists somewhere outside your control — not because of a decision you actually agreed with, just to avoid a moment.",
+            A: "It's sent, and now something you weren't comfortable with exists somewhere outside your control — not because of a decision you actually agreed with, just to avoid a moment. Beyond how it feels, images like this carry real risks once they're out of your hands, for both people involved.",
             B: "There's a beat of awkwardness, and then it's over — a clear no is easier to respect than an unclear one.",
             C: "The answer reveals whether this is really about you, or about pressure they're passing along from somewhere else.",
             D: "The subject comes back up again later, since it was never actually addressed.",
-            E: "It buys a moment, but the actual question is still sitting there unanswered."
+            E: "It buys a moment, but the actual question is still sitting there unanswered.",
+            F: "The adult takes it seriously, helps you figure out what to say and do next, and you're not carrying the pressure by yourself anymore."
           },
-          concept: "'Everyone does it' is almost never actually true, and it's not a reason on its own — the only reason that matters is whether you're actually comfortable, not whether it's common.",
-          takeaway: "What's a clear, simple way you could say no to something like this, that you'd actually feel comfortable using?"
+          concept: "'Everyone does it' is almost never actually true, and it's not a reason on its own. This also isn't only about one awkward moment — images like this can have real consequences once they exist outside your control, which is exactly why a clear no matters more than it might feel like it does right now.",
+          takeaway: "What's a clear, simple way you could say no to something like this, that you'd actually feel comfortable using — and who's someone you could tell if the pressure kept going?"
         }
       ]
     },
@@ -156,14 +158,16 @@ const MODULE_RELATIONSHIPS_RESPONSIBILITY = {
             { id: "B", text: "Bring specific examples to them directly and see how they respond.", dcera: { D: 5, C: 4, E: 3, R: 4, A: 4 }, reason: "Puts specific evidence in front of the actual person, instead of guessing at what they'd say." },
             { id: "C", text: "Quietly start doing the things you'd stopped doing again, without discussing it.", dcera: { D: 3, C: 3, E: 2, R: 3, A: 4 }, reason: "A real test, though a quieter one — it reveals the relationship's actual flexibility without a confrontation." },
             { id: "D", text: "Ask a friend who's known you a long time if they've noticed a change.", dcera: { D: 5, C: 4, E: 3, R: 5, A: 4 }, reason: "Someone who's known you longer than this relationship has real, useful perspective on what's actually changed." },
-            { id: "E", text: "End it without any conversation about why.", dcera: { D: 3, C: 2, E: 2, R: 4, A: 2 }, reason: "Ends the pattern, but skips finding out whether it was addressable — sometimes the safer choice, but not always the only one." }
+            { id: "E", text: "End it without any conversation about why.", dcera: { D: 4, C: 3, E: 2, R: 5, A: 3 }, reason: "Ends a pattern that was already costing you real parts of your life — you don't need to fully diagnose an isolating dynamic before deciding you're done with it." },
+            { id: "F", text: "Talk to a school counselor or trusted adult about what's been happening.", dcera: { D: 5, C: 5, E: 3, R: 5, A: 4 }, reason: "A pattern like this is genuinely hard to see clearly from inside it — someone trained to spot it can help you name what's actually going on." }
           ],
           consequences: {
             A: "The adjustments keep compounding, and a year from now, a lot less of your life looks like it used to.",
             B: "Their response tells you a lot — either real reflection, or more reasons why your friends, clothes, or plans were the problem.",
             C: "It creates friction, but it also tests whether the relationship can hold you doing your own things again.",
             D: "The friend confirms what you'd started to suspect, and it's easier to trust once someone else has seen it too.",
-            E: "It's over, but you don't get real information about whether it would have been possible to address directly."
+            E: "It's over. You don't get a direct answer for why it was happening, but you also don't owe anyone a full investigation before choosing to leave.",
+            F: "They help you see the pattern clearly, and having an adult's perspective makes it much easier to decide what to do next, whatever that turns out to be."
           },
           concept: "Isolation rarely arrives as one big moment — it arrives as a hundred small 'just an opinion' comments that are each too small to be worth a fight, until the total adds up to something a fight was actually warranted for.",
           takeaway: "Who in your life would notice first, if this started happening to you?"
@@ -178,19 +182,21 @@ const MODULE_RELATIONSHIPS_RESPONSIBILITY = {
           ],
           choices: [
             { id: "A", text: "Give in to stop the conversation from coming up again.", dcera: { D: 1, C: 1, E: 2, R: 1, A: 1 }, reason: "'If you really cared, you would' is a pressure tactic, not an argument — giving in confirms the tactic works." },
-            { id: "B", text: "Repeat your boundary clearly, without new justification each time.", dcera: { D: 5, C: 5, E: 3, R: 5, A: 4 }, reason: "Consistency is what makes a boundary real — repeating it unchanged is more effective than defending it differently each time." },
+            { id: "B", text: "Repeat your boundary clearly, without new justification each time.", dcera: { D: 4, C: 4, E: 3, R: 4, A: 4 }, reason: "Consistency is what makes a boundary real — but it's one good response among several here, not the only one, and it doesn't have to be the last one you try." },
             { id: "C", text: "Ask them directly why 'if you really cared' feels like the right argument to them.", dcera: { D: 4, C: 4, E: 3, R: 4, A: 4 }, reason: "Names the tactic itself instead of just the disagreement, which often reveals more than debating the actual issue." },
-            { id: "D", text: "End the relationship over this pattern.", dcera: { D: 4, C: 3, E: 2, R: 5, A: 2 }, reason: "A complete, protective answer to a real pattern, at the cost of ever finding out if a direct conversation would have worked." },
-            { id: "E", text: "Avoid being alone with them to sidestep the conversation.", dcera: { D: 2, C: 2, E: 2, R: 2, A: 2 }, reason: "Delays the conversation without resolving it — the same pressure is likely to resurface." }
+            { id: "D", text: "End the relationship over this pattern.", dcera: { D: 5, C: 4, E: 3, R: 5, A: 3 }, reason: "A clear, protective response to pressure that keeps returning — leaving isn't a failure to communicate well enough; it's a legitimate answer to a boundary that isn't being respected." },
+            { id: "E", text: "Avoid being alone with them to sidestep the conversation.", dcera: { D: 2, C: 2, E: 2, R: 2, A: 2 }, reason: "Delays the conversation without resolving it — the same pressure is likely to resurface." },
+            { id: "F", text: "Talk to a school counselor or trusted adult about the pressure you're getting.", dcera: { D: 5, C: 5, E: 3, R: 5, A: 4 }, reason: "Persistent pressure like this is exactly what a trusted adult can help you think through — you don't have to carry it, or decide what to do about it, alone." }
           ],
           consequences: {
             A: "The boundary moves, but not because you actually changed your mind — and the same pressure tactic likely works again next time.",
-            B: "It takes repeating more than once, but a boundary stated the same way every time is harder to argue with than one that keeps shifting.",
+            B: "It takes repeating more than once, and it works for now — though the same pressure may well return again another way.",
             C: "The question puts the tactic itself under a light, which is often more revealing than arguing about the boundary directly.",
-            D: "It's a clear, complete answer, though it skips finding out whether naming the pattern directly might have changed anything.",
-            E: "The avoidance buys short-term relief, but the actual conversation is still unresolved and waiting."
+            D: "It's a clear, complete answer to a pattern that kept returning no matter how it was addressed — you don't owe anyone a repeated negotiation over a boundary you already stated.",
+            E: "The avoidance buys short-term relief, but the actual conversation is still unresolved and waiting.",
+            F: "They take it seriously, help you think through what's happening, and remind you that a clear no doesn't need to be defended alone."
           },
-          concept: "\"If you really cared, you would\" is designed to make caring and doing the same thing — they aren't. A boundary that changes under that kind of pressure was never really a boundary; it was a starting offer.",
+          concept: "\"If you really cared, you would\" is designed to make caring and doing the same thing — they aren't. A boundary that someone keeps pushing against, again and again, isn't a communication problem for you to solve on your own — it's information about the relationship itself.",
           takeaway: "What's a boundary you've held clearly before, and what made it easier to hold that time?"
         },
         {
