@@ -1,4 +1,4 @@
-// HUMAN SYSTEMS LAB — engine.js
+// LIFE//SHIFT — engine.js
 // Generic state machine: session setup, the seven-beat scenario flow with
 // simultaneous team answering, automatic DCERA scoring, a live scoreboard,
 // and an end-of-session winner reveal. Never references module content by
@@ -29,7 +29,7 @@ const BEAT_LABELS = ["Hook", "Think", "Discuss", "Answer", "Results", "Reflect",
 const SHEET_URL_KEY = "hsl_sheet_url"; // legacy single-URL key, migrated on load
 const SHEET_URLS_KEY = "hsl_sheet_urls";
 const SHEET_SELECTED_KEY = "hsl_sheet_selected_id";
-const TEAM_COLORS = ["#F43F5E", "#8B5CF6", "#22D3A5", "#FBBF24", "#3B82F6", "#FB7185", "#34D399", "#F472B6", "#60A5FA", "#C084FC"];
+const TEAM_COLORS = ["#E8402C", "#2D6CDF", "#1FA86B", "#F4C400", "#7A3FE8", "#FF2E63", "#00B5A0", "#F2810F", "#D6336C", "#4C9BE8"];
 const REDUCE_MOTION = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // Baked-in default so the app needs zero setup on any classroom computer.
@@ -87,8 +87,47 @@ function freshState() {
   };
 }
 
+function showBootSequence() {
+  if (sessionStorage.getItem("hsl_booted")) return; // once per browser tab session
+  sessionStorage.setItem("hsl_booted", "1");
+  if (REDUCE_MOTION) return;
+  const lines = [
+    "> BOOTING LIFE//SHIFT SIMULATOR...",
+    "> LOADING HUMAN SYSTEMS LAB CORE...",
+    "> CALIBRATING DCERA ENGINE... OK",
+    "> READY."
+  ];
+  const boot = el(`<div id="boot"><div class="scan"></div><div class="line" id="bootText"></div><div class="skip-hint no-print">tap anywhere to skip</div></div>`);
+  document.body.appendChild(boot);
+  const textEl = boot.querySelector("#bootText");
+  let li = 0, ci = 0, out = "", done = false;
+  function finish() {
+    if (done) return;
+    done = true;
+    boot.classList.add("hide");
+    setTimeout(() => boot.remove(), 1000);
+  }
+  function typeStep() {
+    if (done) return;
+    if (li >= lines.length) { setTimeout(finish, 450); return; }
+    const line = lines[li];
+    if (ci <= line.length) {
+      textEl.innerHTML = out + line.slice(0, ci) + '<span class="cursor"></span>';
+      ci++;
+      setTimeout(typeStep, 16 + Math.random() * 20);
+    } else {
+      out += line + "\n";
+      li++; ci = 0;
+      setTimeout(typeStep, 200);
+    }
+  }
+  boot.addEventListener("click", finish);
+  typeStep();
+}
+
 function init() {
   state = freshState();
+  showBootSequence();
   render();
 }
 
@@ -179,11 +218,22 @@ function sessionHeader(sub) {
 
 function renderHome() {
   const wrap = el(`<div class="screen home-screen">
-    <span class="eyebrow">Human Systems Lab</span>
-    <h1>Make the call. See what happens.</h1>
-    <p class="lead">This is a life-skills decision lab, not a lecture. Your team gets a real situation — a rumour, a budget, a viral post, a career choice — and has to decide what to do. There's no briefing first. You choose, then find out what it actually leads to.</p>
+    <div class="hero-wrap">
+      <div class="hero-sky"></div>
+      <div class="hero-burst"></div>
+      <div class="hero-grid"></div>
+      <div class="hero-content">
+        <span class="eyebrow">Human Systems Lab // Classroom Simulator</span>
+        <h1 class="title-chrome">LIFE&#47;&#47;SHIFT</h1>
+        <p class="title-sub">MAKE THE CALL</p>
+        <p class="lead">This is a life-skills decision lab, not a lecture. Your team gets a real situation — a rumour, a budget, a viral post, a career choice — and has to decide what to do. There's no briefing first. You choose, then find out what it actually leads to.</p>
+        <button class="btn btn-primary" id="enter" style="min-width:240px; margin-top:0.5rem;">&gt; Start a session_</button>
+      </div>
+    </div>
 
-    <h3 style="margin-top:0.6rem;">How a round works</h3>
+    <div class="stripe-divider"></div>
+
+    <h3 style="margin-top:0.6rem;">SEQ_01 // How a round works</h3>
     <div class="steps-grid">
       <div class="step-card"><span class="step-num">1</span><h4>See the situation</h4><p>One scenario, shown once, for every team at the same time.</p></div>
       <div class="step-card"><span class="step-num">2</span><h4>Think, then talk</h4><p>Decide on your own for a minute, then argue it out as a team.</p></div>
@@ -192,22 +242,34 @@ function renderHome() {
       <div class="step-card"><span class="step-num">5</span><h4>Get scored, with reasons</h4><p>Your DCERA score is revealed instantly, with why — not just a number.</p></div>
     </div>
 
-    <h3 style="margin-top:0.6rem;">What DCERA actually measures</h3>
+    <div class="stripe-divider"></div>
+
+    <h3 style="margin-top:0.6rem;">SEQ_02 // What DCERA actually measures</h3>
     <p class="lead" style="font-size:1rem;">Every choice your team makes is scored on five dimensions — not "right or wrong," but how well you handled the trade-offs. There's no perfect score to hunt for; the goal is getting sharper on all five over a term.</p>
     <div class="dcera-legend">
-      <div class="legend-card"><span class="legend-letter">D</span><h4>Decision quality</h4><p>Did you address the real problem, not just react to it?</p></div>
-      <div class="legend-card"><span class="legend-letter">C</span><h4>Consequence awareness</h4><p>Did you think about what happens next — not just right now?</p></div>
-      <div class="legend-card"><span class="legend-letter">E</span><h4>Empathy</h4><p>Did you consider how it affects everyone else involved?</p></div>
-      <div class="legend-card"><span class="legend-letter">R</span><h4>Risk assessment</h4><p>Did you weigh what could realistically go wrong?</p></div>
-      <div class="legend-card"><span class="legend-letter">A</span><h4>Adaptability</h4><p>Could you adjust if the situation changed on you?</p></div>
+      <div class="legend-card"><span class="legend-letter" data-l="D">D</span><h4>Decision quality</h4><p>Did you address the real problem, not just react to it?</p></div>
+      <div class="legend-card"><span class="legend-letter" data-l="C">C</span><h4>Consequence awareness</h4><p>Did you think about what happens next — not just right now?</p></div>
+      <div class="legend-card"><span class="legend-letter" data-l="E">E</span><h4>Empathy</h4><p>Did you consider how it affects everyone else involved?</p></div>
+      <div class="legend-card"><span class="legend-letter" data-l="R">R</span><h4>Risk assessment</h4><p>Did you weigh what could realistically go wrong?</p></div>
+      <div class="legend-card"><span class="legend-letter" data-l="A">A</span><h4>Adaptability</h4><p>Could you adjust if the situation changed on you?</p></div>
     </div>
 
-    <div class="row" style="margin-top:1.5rem;">
+    <div class="row" style="margin-top:1rem;">
       <div class="spacer"></div>
-      <button class="btn btn-primary" id="enter" style="min-width:240px;">Start a session</button>
+      <button class="btn btn-primary" id="enterBottom" style="min-width:240px;">&gt; Start a session_</button>
     </div>
   </div>`);
   wrap.querySelector("#enter").addEventListener("click", () => { state.screen = "launcher"; render(); });
+  wrap.querySelector("#enterBottom").addEventListener("click", () => { state.screen = "launcher"; render(); });
+
+  if (!REDUCE_MOTION && "IntersectionObserver" in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add("in-view"); });
+    }, { threshold: 0.2 });
+    wrap.querySelectorAll(".step-card, .legend-card").forEach(card => io.observe(card));
+  } else {
+    wrap.querySelectorAll(".step-card, .legend-card").forEach(card => card.classList.add("in-view"));
+  }
   return wrap;
 }
 
@@ -215,7 +277,7 @@ function renderHome() {
 
 function renderLauncher() {
   const wrap = el(`<div class="screen">
-    <span class="eyebrow">Human Systems Lab</span>
+    <span class="eyebrow">LIFE&#47;&#47;SHIFT</span>
     <h1>Start a session</h1>
     <div class="card col">
       <div class="field">
