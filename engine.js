@@ -30,7 +30,7 @@ const BEAT_LABELS = ["Hook", "Think", "Discuss", "Answer", "Results", "Reflect",
 const SHEET_URL_KEY = "hsl_sheet_url"; // legacy single-URL key, migrated on load
 const SHEET_URLS_KEY = "hsl_sheet_urls";
 const SHEET_SELECTED_KEY = "hsl_sheet_selected_id";
-const TEAM_COLORS = ["#E8402C", "#2D6CDF", "#1FA86B", "#F4C400", "#7A3FE8", "#FF2E63", "#00B5A0", "#F2810F", "#D6336C", "#4C9BE8"];
+const TEAM_COLORS = ["#FF2F7E", "#45E8FF", "#9B5CFF", "#FFB92E", "#7DFFB0", "#FF5C8A", "#4C9BFF", "#FF8A3D", "#C86BFF", "#2DE8C0"];
 const REDUCE_MOTION = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // Baked-in default so the app needs zero setup on any classroom computer.
@@ -197,9 +197,9 @@ function scoreboardStrip() {
       const total = teamTotal(t.id);
       const pct = Math.round((total / (max || 1)) * 100);
       return `<div class="sb-team">
-        <span class="sb-dot" style="background:${t.color}"></span>
+        <span class="sb-dot" style="background:${t.color}; color:${t.color};"></span>
         <span class="sb-name">${t.name}</span>
-        <span class="sb-bar-track"><span class="sb-bar-fill" style="width:${pct}%; background:${t.color};"></span></span>
+        <span class="sb-bar-track"><span class="sb-bar-fill" style="width:${pct}%; background:${t.color}; color:${t.color};"></span></span>
         <span class="sb-total">${total}</span>
       </div>`;
     }).join("")}
@@ -607,7 +607,7 @@ function renderResults() {
         const consequence = getConsequenceText(s, choiceId);
         return `<div class="result-card" style="--team-color:${team.color}; animation-delay:${REDUCE_MOTION ? 0 : i * 0.12}s;">
           <div class="result-head">
-            <span class="sb-dot" style="background:${team.color}"></span>
+            <span class="sb-dot" style="background:${team.color}; color:${team.color};"></span>
             <span class="result-team">${team.name}</span>
             <span class="result-choice">chose ${choiceId}</span>
           </div>
@@ -743,17 +743,23 @@ function maybeSyncLive() {
 
 function spawnConfetti(container) {
   if (REDUCE_MOTION) return;
-  const colors = [...TEAM_COLORS, "#FBBF24"];
+  const colors = [...TEAM_COLORS, "#FFB92E"];
   for (let i = 0; i < 60; i++) {
     const piece = document.createElement("span");
     piece.className = "confetti-piece";
     piece.style.left = Math.random() * 100 + "%";
-    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.background = color;
+    piece.style.color = color;
     piece.style.animationDelay = (Math.random() * 0.6) + "s";
     piece.style.animationDuration = (2.2 + Math.random() * 1.4) + "s";
     piece.style.transform = `rotate(${Math.random() * 360}deg)`;
     container.appendChild(piece);
   }
+  // Pieces use animation-fill-mode: forwards so they hold their landing
+  // spot instead of snapping back — clear them once every piece has
+  // finished falling, or they'd sit frozen over whatever scrolls under them.
+  setTimeout(() => { container.innerHTML = ""; }, 4200);
 }
 
 function renderDebrief() {
@@ -776,7 +782,7 @@ function renderDebrief() {
         <tbody>
           ${state.teams.slice().sort((a, b) => teamTotal(b.id) - teamTotal(a.id)).map(t => {
             const avg = avgDcera(t.id);
-            return `<tr><td><span class="sb-dot" style="background:${t.color}"></span> ${t.name}</td><td class="num"><b>${teamTotal(t.id)}</b></td>${avg ? DCERA_DIMS.map(d => `<td class="num">${avg[d.letter]}</td>`).join("") : `<td colspan="5">no scores recorded</td>`}</tr>`;
+            return `<tr><td><span class="sb-dot" style="background:${t.color}; color:${t.color};"></span> ${t.name}</td><td class="num"><b>${teamTotal(t.id)}</b></td>${avg ? DCERA_DIMS.map(d => `<td class="num">${avg[d.letter]}</td>`).join("") : `<td colspan="5">no scores recorded</td>`}</tr>`;
           }).join("")}
         </tbody>
       </table>
