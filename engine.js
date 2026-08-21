@@ -93,10 +93,10 @@ function showBootSequence() {
   sessionStorage.setItem("hsl_booted", "1");
   if (REDUCE_MOTION) return;
   const lines = [
-    "> BOOTING LIFE//SHIFT SIMULATOR...",
-    "> LOADING HUMAN SYSTEMS LAB CORE...",
-    "> CALIBRATING DCERA ENGINE... OK",
-    "> READY."
+    "> STARTING LIFE//SHIFT...",
+    "> GETTING THE SIMULATOR READY...",
+    "> LOADING YOUR SCORES... OK",
+    "> LET'S GO."
   ];
   const boot = el(`<div id="boot"><div class="scan"></div><div class="line" id="bootText"></div><div class="skip-hint no-print">tap anywhere to skip</div></div>`);
   document.body.appendChild(boot);
@@ -227,7 +227,7 @@ function renderHome() {
         <span class="eyebrow">Human Systems Lab // Classroom Simulator</span>
         <h1 class="title-chrome">LIFE&#47;&#47;SHIFT</h1>
         <p class="title-sub">MAKE THE CALL</p>
-        <p class="lead">This is a life-skills decision lab, not a lecture. Your team gets a real situation — a rumour, a budget, a viral post, a career choice — and has to decide what to do. There's no briefing first. You choose, then find out what it actually leads to.</p>
+        <p class="lead">This is not a lecture. It's a game about real life. Your team gets a real problem, like a rumour, a budget, a viral post, or a career choice. You decide what to do. Nobody tells you the answer first. You choose, then you see what happens next.</p>
         <button class="btn btn-primary" id="enter" style="min-width:240px; margin-top:0.5rem;">&gt; Start a session_</button>
       </div>
     </div>
@@ -236,23 +236,23 @@ function renderHome() {
 
     <h3 style="margin-top:0.6rem;">SEQ_01 // How a round works</h3>
     <div class="steps-grid">
-      <div class="step-card"><span class="step-num">1</span><h4>See the situation</h4><p>One scenario, shown once, for every team at the same time.</p></div>
-      <div class="step-card"><span class="step-num">2</span><h4>Think, then talk</h4><p>Decide on your own for a minute, then argue it out as a team.</p></div>
-      <div class="step-card"><span class="step-num">3</span><h4>Lock in your answer</h4><p>Every team answers the same question — no do-overs once it's in.</p></div>
-      <div class="step-card"><span class="step-num">4</span><h4>See what happens</h4><p>Your choice plays out, and so does everyone else's.</p></div>
-      <div class="step-card"><span class="step-num">5</span><h4>Get scored, with reasons</h4><p>Your DCERA score is revealed instantly, with why — not just a number.</p></div>
+      <div class="step-card"><span class="step-num">1</span><h4>See what's happening</h4><p>You'll see one real situation. Everyone sees it at the same time.</p></div>
+      <div class="step-card"><span class="step-num">2</span><h4>Think, then talk</h4><p>First, think on your own. Then talk it over with your team.</p></div>
+      <div class="step-card"><span class="step-num">3</span><h4>Give your answer</h4><p>Every team answers the same question. Once you answer, that's it. No changing your mind.</p></div>
+      <div class="step-card"><span class="step-num">4</span><h4>See what happens</h4><p>Now you find out what happens. Your choice, and everyone else's too.</p></div>
+      <div class="step-card"><span class="step-num">5</span><h4>Get your score</h4><p>You get your score right away, and we tell you why. Not just a number.</p></div>
     </div>
 
     <div class="stripe-divider"></div>
 
     <h3 style="margin-top:0.6rem;">SEQ_02 // What DCERA actually measures</h3>
-    <p class="lead" style="font-size:1rem;">Every choice your team makes is scored on five dimensions — not "right or wrong," but how well you handled the trade-offs. There's no perfect score to hunt for; the goal is getting sharper on all five over a term.</p>
+    <p class="lead" style="font-size:1rem;">Every choice you make gets a score in five parts. This is not about right or wrong. It is about how well you thought it through. There is no perfect score to chase. The goal is to get a little better at all five, all year.</p>
     <div class="dcera-legend">
-      <div class="legend-card"><span class="legend-letter" data-l="D">D</span><h4>Decision quality</h4><p>Did you address the real problem, not just react to it?</p></div>
-      <div class="legend-card"><span class="legend-letter" data-l="C">C</span><h4>Consequence awareness</h4><p>Did you think about what happens next — not just right now?</p></div>
-      <div class="legend-card"><span class="legend-letter" data-l="E">E</span><h4>Empathy</h4><p>Did you consider how it affects everyone else involved?</p></div>
-      <div class="legend-card"><span class="legend-letter" data-l="R">R</span><h4>Risk assessment</h4><p>Did you weigh what could realistically go wrong?</p></div>
-      <div class="legend-card"><span class="legend-letter" data-l="A">A</span><h4>Adaptability</h4><p>Could you adjust if the situation changed on you?</p></div>
+      <div class="legend-card"><span class="legend-letter" data-l="D">D</span><h4>Decision quality</h4><p>Did you deal with the real problem, or just react?</p></div>
+      <div class="legend-card"><span class="legend-letter" data-l="C">C</span><h4>Consequence awareness</h4><p>Did you think about what happens next, not just right now?</p></div>
+      <div class="legend-card"><span class="legend-letter" data-l="E">E</span><h4>Empathy</h4><p>Did you think about how this affects other people too?</p></div>
+      <div class="legend-card"><span class="legend-letter" data-l="R">R</span><h4>Risk assessment</h4><p>Did you think about what could really go wrong?</p></div>
+      <div class="legend-card"><span class="legend-letter" data-l="A">A</span><h4>Adaptability</h4><p>Could you change your plan if things changed?</p></div>
     </div>
 
     <div class="row" style="margin-top:1rem;">
@@ -314,7 +314,7 @@ function renderLauncher() {
         <div class="field">
           <label for="sheetUrlSelect">Google Sheet</label>
           <select id="sheetUrlSelect">
-            <option value="">— None (don't save) —</option>
+            <option value="">None (skip saving)</option>
             ${state.sheetUrls.map(s => `<option value="${s.id}" ${s.id === state.selectedSheetId ? "selected" : ""}>${s.label}</option>`).join("")}
             <option value="__add__">+ Add new Google Sheet…</option>
           </select>
@@ -334,7 +334,7 @@ function renderLauncher() {
           </div>
         </div>
         ${state.selectedSheetId ? `<button class="btn btn-ghost" id="removeSheet" style="align-self:flex-start; padding-left:0;">Remove this saved Sheet</button>` : ""}
-        <p style="font-size:0.85rem; color:var(--ink-soft);">Choose "None" to skip saving — sessions still work fully offline, just without a persistent history.</p>
+        <p style="font-size:0.85rem; color:var(--ink-soft);">Pick "None" to skip saving. The game still works offline. You just won't keep a saved history.</p>
       </div>
     </details>
 
@@ -470,13 +470,13 @@ function renderThink() {
   const s = currentScenario();
   const wrap = el(`<div class="screen">
     ${sessionHeader(progressDots(1))}
-    <h2>Think it through — on your own, 60 seconds</h2>
-    <p class="lead">No talking yet. Everyone decides privately what they would do.</p>
+    <h2>Think it through. On your own, 30 seconds.</h2>
+    <p class="lead">No talking yet. Everyone thinks on their own first.</p>
     <div class="card">
       <ul>${s.predictionPrompts.map(p => `<li>${p}</li>`).join("")}</ul>
     </div>
     <div class="timer-row">
-      <div class="timer" id="timerDisplay">1:00</div>
+      <div class="timer" id="timerDisplay">0:30</div>
       <div class="timer-track"><div class="timer-fill" id="timerBar" style="width:100%;"></div></div>
     </div>
     <div class="row" style="align-items:center;">
@@ -485,7 +485,7 @@ function renderThink() {
       <button class="btn btn-primary" id="next" style="min-width:200px;">Continue</button>
     </div>
   </div>`);
-  mountTimer(wrap, 60);
+  mountTimer(wrap, 30);
   const go = () => stopAndGo(() => { state.screen = "discuss"; render(); });
   wrap.querySelector("#skip").addEventListener("click", go);
   wrap.querySelector("#next").addEventListener("click", go);
@@ -497,10 +497,10 @@ function renderThink() {
 function renderDiscuss() {
   const wrap = el(`<div class="screen">
     ${sessionHeader(progressDots(2))}
-    <h2>Team discussion — up to 2 minutes</h2>
-    <p class="lead">Each team talks it over and settles on one answer. When you're ready, every team locks in their answer on the next screen.</p>
+    <h2>Team discussion. Up to 1 minute.</h2>
+    <p class="lead">Each team talks it over and picks one answer. When you're ready, every team locks in their answer on the next screen.</p>
     <div class="timer-row">
-      <div class="timer" id="timerDisplay">2:00</div>
+      <div class="timer" id="timerDisplay">1:00</div>
       <div class="timer-track"><div class="timer-fill" id="timerBar" style="width:100%;"></div></div>
     </div>
     <div class="row" style="align-items:center;">
@@ -509,7 +509,7 @@ function renderDiscuss() {
       <button class="btn btn-primary" id="next" style="min-width:200px;">Everyone answer now</button>
     </div>
   </div>`);
-  mountTimer(wrap, 120);
+  mountTimer(wrap, 60);
   const go = () => stopAndGo(() => {
     state.activeTeamIndex = 0;
     state.pendingAnswers = {};
@@ -543,7 +543,7 @@ function renderAnswerAll() {
       `).join("")}
     </div>
 
-    <p class="answer-for" id="answerFor">Answering for <strong>${state.teams[state.activeTeamIndex] ? state.teams[state.activeTeamIndex].name : "—"}</strong></p>
+    <p class="answer-for" id="answerFor">Answering for <strong>${state.teams[state.activeTeamIndex] ? state.teams[state.activeTeamIndex].name : "no team yet"}</strong></p>
 
     <div class="choice-list" id="choiceList">
       ${s.choices.map(c => `<button class="btn choice-btn" data-id="${c.id}"><span class="tag">${c.id}</span><span>${c.text}</span></button>`).join("")}
@@ -713,7 +713,7 @@ function buildSyncPayload() {
 function syncStatusLabel() {
   return {
     idle: "", saving: "Saving…", saved: "Saved to Google Sheet ✓",
-    error: "Couldn't save — check the sync URL on the launcher and your connection."
+    error: "Couldn't save. Check the sync URL on the launcher, and check your connection."
   }[state.syncStatus];
 }
 
@@ -759,8 +759,8 @@ function spawnConfetti(container) {
 function renderDebrief() {
   const winners = computeWinners();
   const winnerText = winners.length === 0 ? "" :
-    winners.length === 1 ? `🏆 ${winners[0].name} wins with the strongest choices this session!` :
-    `🏆 ${winners.map(w => w.name).join(" & ")} tie for the win this session!`;
+    winners.length === 1 ? `🏆 Nice work, ${winners[0].name}! You made the strongest choices today.` :
+    `🏆 ${winners.map(w => w.name).join(" & ")}, you're tied for the win! Great choices, both of you.`;
 
   const wrap = el(`<div class="screen">
     ${sessionHeader()}
@@ -781,7 +781,7 @@ function renderDebrief() {
         </tbody>
       </table>
     </div>
-    <p style="font-size:0.9rem; color:var(--ink-soft);">Total = sum of all DCERA points across all ${currentScenarios().length} scenarios. Averages per dimension shown alongside. Full per-scenario detail is in the session log below.</p>
+    <p style="font-size:0.9rem; color:var(--ink-soft);">Total adds up every DCERA point from all ${currentScenarios().length} scenarios. The averages are right next to it. Want more detail? Check the full list below.</p>
     <div class="card" style="overflow-x:auto;">
       <table>
         <thead><tr><th>Scenario</th><th>Team</th><th>Choice</th><th>D</th><th>C</th><th>E</th><th>R</th><th>A</th></tr></thead>
