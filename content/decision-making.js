@@ -6,6 +6,17 @@
 // awareness, Empathy, Risk assessment, Adaptability, 1-5 each) and a `reason`
 // — added 2026-08-18 to support automatic scoring, revealed to teams after
 // all teams have answered a scenario.
+//
+// Prototype, 2026-08-21: this is the first module to use the "compounding
+// scenarios" mechanic. A choice can carry `setsFlag: "name"` to mark a team
+// with that flag for the rest of the session. A later choice can carry
+// `reasonCallbacks: { "name": "extra sentence" }` — if the acting team holds
+// that flag from an EARLIER scenario, the extra sentence is appended under
+// their result card. Flags are per-team, session-only (see `state.flags` in
+// engine.js), and never change the shared hook/choices everyone sees — only
+// a flagged team's own result callback. Two pairs are wired up here: L1
+// "everyone-is-doing-it" -> "study-or-help", and L2 "the-30000-choice" ->
+// "the-opportunity-cost".
 
 const MODULE_DECISION_MAKING = {
   id: "decision-making",
@@ -28,8 +39,8 @@ const MODULE_DECISION_MAKING = {
             "What happens if nobody finds out?"
           ],
           choices: [
-            { id: "A", text: "Go with them.", dcera: { D: 2, C: 2, E: 3, R: 1, A: 2 }, reason: "You followed the group without a real plan for what happens if you get caught. The risk wasn't worth what you gained." },
-            { id: "B", text: "Refuse.", dcera: { D: 4, C: 4, E: 3, R: 5, A: 3 }, reason: "This keeps you safe from the real risk, even though it costs you some social comfort for a little while." },
+            { id: "A", text: "Go with them.", dcera: { D: 2, C: 2, E: 3, R: 1, A: 2 }, reason: "You followed the group without a real plan for what happens if you get caught. The risk wasn't worth what you gained.", setsFlag: "went-along-without-a-plan" },
+            { id: "B", text: "Refuse.", dcera: { D: 4, C: 4, E: 3, R: 5, A: 3 }, reason: "This keeps you safe from the real risk, even though it costs you some social comfort for a little while.", setsFlag: "named-the-risk" },
             { id: "C", text: "Tell a teacher.", dcera: { D: 3, C: 3, E: 2, R: 5, A: 2 }, reason: "This stops the risk completely, but skips talking to the group directly first. It costs some trust for a safer outcome." },
             { id: "D", text: "Go but return before anyone notices.", dcera: { D: 1, C: 1, E: 2, R: 2, A: 2 }, reason: "This works this time, but that's luck, not good judgment. It also makes the next risky choice easier to say yes to." },
             { id: "E", text: "Suggest something else.", dcera: { D: 4, C: 4, E: 4, R: 4, A: 5 }, reason: "You offer another idea instead of just reacting. It's the most flexible choice here, even though you can't control what others do." }
@@ -85,8 +96,8 @@ const MODULE_DECISION_MAKING = {
             { id: "A", text: "Tell your friend you can't talk right now, you need to study.", dcera: { D: 2, C: 2, E: 1, R: 4, A: 2 }, reason: "This protects your exam outcome completely, but leaves your friend without support at a hard moment." },
             { id: "B", text: "Make time for a short conversation, then go back to studying.", dcera: { D: 4, C: 4, E: 4, R: 4, A: 5 }, reason: "This balances both needs directly instead of treating them like you can only pick one." },
             { id: "C", text: "Set the exam aside and be there for your friend.", dcera: { D: 4, C: 3, E: 5, R: 2, A: 3 }, reason: "This puts the relationship first. It's the right call if your friend's need is serious enough." },
-            { id: "D", text: "Suggest they talk to a counselor, and offer to sit with them while they do.", dcera: { D: 5, C: 5, E: 4, R: 4, A: 4 }, reason: "This gets your friend real support without making yourself their only resource. It works better for both of you." },
-            { id: "E", text: "Try to do both at once, half-focus on studying while texting back.", dcera: { D: 1, C: 2, E: 2, R: 2, A: 1 }, reason: "This splits your attention so thin that neither the exam nor the friendship gets what it actually needed." }
+            { id: "D", text: "Suggest they talk to a counselor, and offer to sit with them while they do.", dcera: { D: 5, C: 5, E: 4, R: 4, A: 4 }, reason: "This gets your friend real support without making yourself their only resource. It works better for both of you.", reasonCallbacks: { "named-the-risk": "You did something like this earlier today too. Back then, you named the risk instead of just going along with it. That's starting to look like a pattern, not a one-time thing." } },
+            { id: "E", text: "Try to do both at once, half-focus on studying while texting back.", dcera: { D: 1, C: 2, E: 2, R: 2, A: 1 }, reason: "This splits your attention so thin that neither the exam nor the friendship gets what it actually needed.", reasonCallbacks: { "went-along-without-a-plan": "This looks a bit like what happened earlier today too. Both times, you tried to avoid picking one clear path instead of facing the trade-off head-on. Worth noticing." } }
           ],
           consequences: {
             A: "You study uninterrupted and do well on the exam. Your friend gets through the night on their own, and later tells you they felt alone at a bad moment.",
@@ -112,8 +123,8 @@ const MODULE_DECISION_MAKING = {
             "What's the chance something unplanned comes up in the next six months?"
           ],
           choices: [
-            { id: "A", text: "Buy a phone.", savedAmount: 3000, dcera: { D: 2, C: 1, E: 3, R: 1, A: 2 }, reason: "This spends almost everything on something you want, with no cushion left. It feels good now, but leaves you exposed later." },
-            { id: "B", text: "Save it.", savedAmount: 30000, dcera: { D: 4, C: 5, E: 3, R: 5, A: 3 }, reason: "This gives you the most protection against the unknown, even though it puts off everything you want right now." },
+            { id: "A", text: "Buy a phone.", savedAmount: 3000, dcera: { D: 2, C: 1, E: 3, R: 1, A: 2 }, reason: "This spends almost everything on something you want, with no cushion left. It feels good now, but leaves you exposed later.", setsFlag: "spent-with-no-cushion" },
+            { id: "B", text: "Save it.", savedAmount: 30000, dcera: { D: 4, C: 5, E: 3, R: 5, A: 3 }, reason: "This gives you the most protection against the unknown, even though it puts off everything you want right now.", setsFlag: "protected-the-downside" },
             { id: "C", text: "Invest it.", savedAmount: 30000, locked: true, dcera: { D: 3, C: 2, E: 3, R: 2, A: 2 }, reason: "This is a good long-term instinct, but locked-up money can't help with a short-term emergency. That's a real blind spot." },
             { id: "D", text: "Take a short trip.", savedAmount: 5000, dcera: { D: 2, C: 2, E: 4, R: 1, A: 3 }, reason: "This spends on an experience instead of a thing, but still leaves you very little cushion." },
             { id: "E", text: "Buy something you've wanted for years.", savedAmount: 5000, dcera: { D: 3, C: 2, E: 3, R: 1, A: 3 }, reason: "This is a thought-out want, not an impulse buy. But it still leaves little room for what comes next." },
@@ -164,8 +175,8 @@ const MODULE_DECISION_MAKING = {
             "What are you actually giving up if you say no?"
           ],
           choices: [
-            { id: "A", text: "Accept the internship.", dcera: { D: 3, C: 3, E: 2, R: 2, A: 4 }, reason: "This chooses growth and experience, knowing it costs preparation time you can't get back." },
-            { id: "B", text: "Decline and stay in the college-prep programme.", dcera: { D: 3, C: 4, E: 3, R: 4, A: 2 }, reason: "This protects your original plan, at the cost of an opportunity that might not come around again." },
+            { id: "A", text: "Accept the internship.", dcera: { D: 3, C: 3, E: 2, R: 2, A: 4 }, reason: "This chooses growth and experience, knowing it costs preparation time you can't get back.", reasonCallbacks: { "spent-with-no-cushion": "This matches your ₹30,000 call earlier too. You lean toward the upside even when it leaves less of a safety net. Not wrong, just something worth knowing about how you decide." } },
+            { id: "B", text: "Decline and stay in the college-prep programme.", dcera: { D: 3, C: 4, E: 3, R: 4, A: 2 }, reason: "This protects your original plan, at the cost of an opportunity that might not come around again.", reasonCallbacks: { "protected-the-downside": "Same instinct as your ₹30,000 call earlier. You protect against what you can't predict, even when it costs you something right now." } },
             { id: "C", text: "Try to do a reduced version of both.", dcera: { D: 2, C: 1, E: 2, R: 2, A: 3 }, reason: "This tries to avoid the trade-off completely, which usually means taking a partial cost on both sides." }
           ],
           consequences: {

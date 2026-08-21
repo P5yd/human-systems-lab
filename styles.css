@@ -350,6 +350,17 @@ input[type="text"]:focus, select:focus {
 .dcera-chip:nth-of-type(5) b { color: var(--mint); text-shadow: 0 0 8px rgba(125, 255, 176, 0.6); }
 .result-reason { font-size: 0.92rem; color: var(--ink-soft); font-style: italic; opacity: 0.9; }
 
+.result-callback {
+  margin-top: 0.9rem;
+  padding: 0.8rem 1rem;
+  background: var(--surface-2);
+  border-left: 2px solid var(--violet);
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  box-shadow: -8px 0 20px -14px rgba(155, 92, 255, 0.5);
+}
+.result-callback .eyebrow { color: var(--violet); border-color: rgba(155, 92, 255, 0.35); font-size: 0.66rem; }
+
 .dcera-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.9rem; }
 
 /* ---------- home screen ---------- */

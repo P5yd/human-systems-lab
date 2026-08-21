@@ -84,6 +84,7 @@ function freshState() {
     activeTeamIndex: 0,
     pendingAnswers: {}, // teamId -> choiceId, for the scenario currently being answered
     scores: {},          // scores[teamId][scenarioId] = { D, C, E, R, A }
+    flags: {},            // flags[teamId][flagName] = scenarioId that set it (session-only memory)
     log: []               // [{ scenarioId, teamId, choiceId, dcera }]
   };
 }
@@ -145,6 +146,20 @@ function getChoice(scenario, choiceId) { return scenario.choices.find(c => c.id 
 function getConsequenceText(scenario, choiceId) {
   if (typeof scenario.consequenceFor === "function") return scenario.consequenceFor(choiceId);
   return scenario.consequences[choiceId];
+}
+// Returns the extra callback sentence (if any) this choice should show for a
+// team, based on a flag they earned in an earlier scenario this session.
+// Ignores a flag set by the current scenario itself, so a choice can't call
+// back to something it just triggered in the same reveal.
+function getCallbackText(scenario, choice, teamId) {
+  if (!choice.reasonCallbacks) return "";
+  const teamFlags = state.flags[teamId] || {};
+  for (const flagName in choice.reasonCallbacks) {
+    if (teamFlags[flagName] && teamFlags[flagName] !== scenario.id) {
+      return choice.reasonCallbacks[flagName];
+    }
+  }
+  return "";
 }
 function clearTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
 function stopAndGo(fn) { clearTimer(); fn(); }
@@ -395,7 +410,8 @@ function renderLauncher() {
   wrap.querySelector("#startBtn").addEventListener("click", () => {
     if (!state.teams.length) { alert("Add at least one team first."); return; }
     state.scores = {};
-    state.teams.forEach(t => state.scores[t.id] = {});
+    state.flags = {};
+    state.teams.forEach(t => { state.scores[t.id] = {}; state.flags[t.id] = {}; });
     state.scenarioIndex = 0;
     state.screen = "hook";
     render();
@@ -584,6 +600,10 @@ function renderAnswerAll() {
         const choice = getChoice(s2, choiceId);
         state.scores[team.id][s2.id] = { ...choice.dcera };
         state.log.push({ scenarioId: s2.id, teamId: team.id, choiceId, dcera: { ...choice.dcera } });
+        if (choice.setsFlag) {
+          state.flags[team.id] = state.flags[team.id] || {};
+          state.flags[team.id][choice.setsFlag] = s2.id;
+        }
       });
       state.screen = "results";
       render();
@@ -605,6 +625,7 @@ function renderResults() {
         const choiceId = state.pendingAnswers[team.id];
         const choice = getChoice(s, choiceId);
         const consequence = getConsequenceText(s, choiceId);
+        const callback = getCallbackText(s, choice, team.id);
         return `<div class="result-card" style="--team-color:${team.color}; animation-delay:${REDUCE_MOTION ? 0 : i * 0.12}s;">
           <div class="result-head">
             <span class="sb-dot" style="background:${team.color}; color:${team.color};"></span>
@@ -616,6 +637,7 @@ function renderResults() {
             ${DCERA_DIMS.map(d => `<span class="dcera-chip"><b>${d.letter}</b>${choice.dcera[d.letter]}</span>`).join("")}
           </div>
           <p class="result-reason">${choice.reason}</p>
+          ${callback ? `<p class="result-callback"><span class="eyebrow" style="margin-bottom:0.4rem;">Noticed this session</span><br>${callback}</p>` : ""}
         </div>`;
       }).join("")}
     </div>
