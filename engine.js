@@ -27,6 +27,9 @@ const DCERA_DIMS = [
 ];
 
 const BEAT_LABELS = ["Hook", "Think", "Discuss", "Answer", "Results", "Reflect", "Takeaway"];
+// "Full lesson" mode swaps the takeaway beat for the Phase 1 lesson layer.
+const LESSON_BEATS = ["Hook", "Think", "Discuss", "Answer", "Results", "Reflect", "Examples", "Practice", "Exit check", "Mission"];
+const MISSIONS_KEY = "hsl_last_missions"; // className -> last Life Mission, for next lesson's warm-up
 const SHEET_URL_KEY = "hsl_sheet_url"; // legacy single-URL key, migrated on load
 const SHEET_URLS_KEY = "hsl_sheet_urls";
 const SHEET_SELECTED_KEY = "hsl_sheet_selected_id";
@@ -80,6 +83,14 @@ function freshState() {
     syncStatus: "idle",
     teams: [],
     nextTeamNum: 1,
+    mode: "lesson",       // "lesson" = one scenario with the full lesson layer, "quick" = whole module, game only
+    lessonScenarioIndex: 0,
+    lastMission: null,    // { mission, scenarioTitle, date } from this class's previous lesson, if any
+    rewinding: false,     // true while teams re-answer a scenario with hindsight
+    rewindAnswers: {},    // teamId -> choiceId, for the rewind in progress
+    rewound: {},          // rewound[scenarioId][teamId] = choiceId (never changes scores)
+    exitChecks: {},       // exitChecks[scenarioId] = 0-5, the class's fist-to-five average
+    practiceRound: 0,
     scenarioIndex: 0,
     activeTeamIndex: 0,
     pendingAnswers: {}, // teamId -> choiceId, for the scenario currently being answered
@@ -161,6 +172,24 @@ function getCallbackText(scenario, choice, teamId) {
   }
   return "";
 }
+function lessonReady() { return currentScenarios().some(s => s.lesson); }
+function isLessonMode() { return state.mode === "lesson" && lessonReady(); }
+
+// Last Life Mission per class, so the next lesson can open with it. Keyed by
+// the class name typed on the launcher; an unnamed class isn't remembered.
+function classKey() { return (state.className || "").trim().toLowerCase(); }
+function loadMissions() {
+  try { return JSON.parse(localStorage.getItem(MISSIONS_KEY)) || {}; } catch (e) { return {}; }
+}
+function saveMission(scenario) {
+  if (!classKey()) return;
+  try {
+    const all = loadMissions();
+    all[classKey()] = { mission: scenario.lesson.mission, scenarioTitle: scenario.title, date: new Date().toISOString() };
+    localStorage.setItem(MISSIONS_KEY, JSON.stringify(all));
+  } catch (e) { /* storage blocked: the warm-up just won't appear next time */ }
+}
+
 function clearTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
 function stopAndGo(fn) { clearTimer(); fn(); }
 
@@ -182,8 +211,15 @@ function render() {
     discuss: renderDiscuss,
     answerAll: renderAnswerAll,
     results: renderResults,
+    rewindResults: renderRewindResults,
     reflection: renderReflection,
     takeaway: renderTakeaway,
+    warmup: renderWarmup,
+    examples: renderExamples,
+    story: renderStory,
+    practice: renderPractice,
+    exitCheck: renderExitCheck,
+    mission: renderMission,
     debrief: renderDebrief
   };
   app.appendChild(map[state.screen]());
@@ -192,7 +228,8 @@ function render() {
 // ---------- SHARED CHROME ----------
 
 function progressDots(activeIdx) {
-  return `<div class="progress">${BEAT_LABELS.map((_, i) =>
+  const beats = isLessonMode() ? LESSON_BEATS : BEAT_LABELS;
+  return `<div class="progress">${beats.map((_, i) =>
     `<span class="dot ${i < activeIdx ? "done" : ""} ${i === activeIdx ? "current" : ""}"></span>`
   ).join("")}</div>`;
 }
@@ -310,9 +347,35 @@ function renderLauncher() {
       <div class="field">
         <label for="module">Module</label>
         <select id="module">
-          ${AVAILABLE_MODULES.map(m => `<option value="${m.id}">${m.title}</option>`).join("")}
+          ${AVAILABLE_MODULES.map(m => `<option value="${m.id}" ${m.id === state.moduleId ? "selected" : ""}>${m.title}</option>`).join("")}
         </select>
       </div>
+    </div>
+
+    <div class="col">
+      <h3>Session type</h3>
+      <div class="mode-picker" role="radiogroup" aria-label="Session type">
+        <button class="mode-option ${isLessonMode() ? "active" : ""}" data-mode="lesson" role="radio" aria-checked="${isLessonMode()}" ${lessonReady() ? "" : "disabled"}>
+          <span class="mode-title">Full lesson</span>
+          <span class="mode-desc">One scenario, about 40 minutes. Adds examples, practice, an exit check, and a Life Mission.</span>
+          ${lessonReady() ? "" : `<span class="mode-soon">Lesson plans are ready for Decision-Making so far.</span>`}
+        </button>
+        <button class="mode-option ${isLessonMode() ? "" : "active"}" data-mode="quick" role="radio" aria-checked="${!isLessonMode()}">
+          <span class="mode-title">Quick play</span>
+          <span class="mode-desc">Every scenario in the module, back to back. The game only.</span>
+        </button>
+      </div>
+      ${isLessonMode() ? `
+        <div class="card col">
+          <div class="field">
+            <label for="lessonScenario">Scenario for this lesson</label>
+            <select id="lessonScenario">
+              ${currentScenarios().map((s, i) => s.lesson ? `<option value="${i}" ${i === state.lessonScenarioIndex ? "selected" : ""}>${i + 1}. ${s.title}</option>` : "").join("")}
+            </select>
+          </div>
+          <a class="btn guide-link" href="guide.html?module=${state.moduleId}&level=${state.level}" target="_blank" rel="noopener">Open the teacher guide ↗</a>
+          <p style="font-size:0.85rem; color:var(--ink-soft);">The guide shows each lesson's goal and discussion notes. Read it or print it before class, and keep it off the projector.</p>
+        </div>` : ""}
     </div>
 
     <div class="col">
@@ -360,8 +423,22 @@ function renderLauncher() {
   </div>`);
 
   wrap.querySelector("#className").addEventListener("input", e => state.className = e.target.value);
-  wrap.querySelector("#level").addEventListener("change", e => state.level = e.target.value);
-  wrap.querySelector("#module").addEventListener("change", e => state.moduleId = e.target.value);
+  const firstLessonIndex = () => Math.max(0, currentScenarios().findIndex(s => s.lesson));
+  wrap.querySelector("#level").addEventListener("change", e => {
+    state.level = e.target.value;
+    state.lessonScenarioIndex = firstLessonIndex();
+    render();
+  });
+  wrap.querySelector("#module").addEventListener("change", e => {
+    state.moduleId = e.target.value;
+    state.lessonScenarioIndex = firstLessonIndex();
+    render();
+  });
+  wrap.querySelectorAll(".mode-option").forEach(btn => {
+    btn.addEventListener("click", () => { state.mode = btn.dataset.mode; render(); });
+  });
+  const lessonSelect = wrap.querySelector("#lessonScenario");
+  if (lessonSelect) lessonSelect.addEventListener("change", e => state.lessonScenarioIndex = Number(e.target.value));
   const sheetSelect = wrap.querySelector("#sheetUrlSelect");
   const addForm = wrap.querySelector("#addSheetForm");
   sheetSelect.addEventListener("change", e => {
@@ -412,8 +489,18 @@ function renderLauncher() {
     state.scores = {};
     state.flags = {};
     state.teams.forEach(t => { state.scores[t.id] = {}; state.flags[t.id] = {}; });
-    state.scenarioIndex = 0;
-    state.screen = "hook";
+    state.rewound = {};
+    state.exitChecks = {};
+    if (isLessonMode()) {
+      state.mode = "lesson";
+      state.scenarioIndex = state.lessonScenarioIndex;
+      state.lastMission = classKey() ? loadMissions()[classKey()] || null : null;
+      state.screen = state.lastMission ? "warmup" : "hook";
+    } else {
+      state.mode = "quick";
+      state.scenarioIndex = 0;
+      state.screen = "hook";
+    }
     render();
   });
 
@@ -541,20 +628,24 @@ function renderDiscuss() {
 
 function renderAnswerAll() {
   const s = currentScenario();
-  const allAnswered = state.teams.every(t => state.pendingAnswers[t.id]);
+  // A rewind reuses this screen, but records into rewindAnswers and never
+  // touches scores: the first answer is the one that counts.
+  const answers = state.rewinding ? state.rewindAnswers : state.pendingAnswers;
+  const allAnswered = state.teams.every(t => answers[t.id]);
   const wrap = el(`<div class="screen">
     ${sessionHeader(progressDots(3))}
-    <h2>${s.title}</h2>
+    ${state.rewinding ? `<span class="eyebrow rewind-eyebrow">Rewind</span>` : ""}
+    <h2>${state.rewinding ? `You know what happens now. Would you choose the same?` : s.title}</h2>
     <p class="lead">${s.hook}</p>
     ${s.followUpEvent ? `<div class="consequence-box">${s.followUpEvent}</div>` : ""}
 
     <div class="team-tabs" id="teamTabs">
       ${state.teams.map((t, i) => `
-        <button class="team-tab ${i === state.activeTeamIndex ? "active" : ""} ${state.pendingAnswers[t.id] ? "answered" : ""}"
+        <button class="team-tab ${i === state.activeTeamIndex ? "active" : ""} ${answers[t.id] ? "answered" : ""}"
                 data-idx="${i}" style="--team-color:${t.color};">
           <span class="tt-dot"></span>
           <span class="tt-name">${t.name}</span>
-          ${state.pendingAnswers[t.id] ? `<span class="tt-check">${state.pendingAnswers[t.id]} ✓</span>` : ""}
+          ${answers[t.id] ? `<span class="tt-check">${answers[t.id]} ✓</span>` : ""}
         </button>
       `).join("")}
     </div>
@@ -567,7 +658,7 @@ function renderAnswerAll() {
 
     <div class="row" style="margin-top:1rem;">
       <div class="spacer"></div>
-      <button class="btn btn-primary" id="reveal" ${allAnswered ? "" : "disabled"} style="min-width:240px;">Reveal results</button>
+      <button class="btn btn-primary" id="reveal" ${allAnswered ? "" : "disabled"} style="min-width:240px;">${state.rewinding ? "Reveal the rewind" : "Reveal results"}</button>
     </div>
   </div>`);
 
@@ -584,15 +675,22 @@ function renderAnswerAll() {
     btn.addEventListener("click", () => {
       const team = state.teams[state.activeTeamIndex];
       if (!team) return;
-      state.pendingAnswers[team.id] = btn.dataset.id;
-      const nextUnanswered = state.teams.findIndex(t => !state.pendingAnswers[t.id]);
+      answers[team.id] = btn.dataset.id;
+      const nextUnanswered = state.teams.findIndex(t => !answers[t.id]);
       state.activeTeamIndex = nextUnanswered === -1 ? state.activeTeamIndex : nextUnanswered;
       render();
     });
   });
 
   const revealBtn = wrap.querySelector("#reveal");
-  if (allAnswered) {
+  if (allAnswered && state.rewinding) {
+    revealBtn.addEventListener("click", () => {
+      state.rewound[s.id] = { ...state.rewindAnswers };
+      state.rewinding = false;
+      state.screen = "rewindResults";
+      render();
+    });
+  } else if (allAnswered) {
     revealBtn.addEventListener("click", () => {
       const s2 = currentScenario();
       state.teams.forEach(team => {
@@ -642,6 +740,58 @@ function renderResults() {
       }).join("")}
     </div>
     <div class="row" style="margin-top:1.5rem;">
+      ${state.rewound[s.id] ? "" : `<button class="btn" id="rewind">Rewind with hindsight</button>`}
+      <div class="spacer"></div>
+      <button class="btn btn-primary" id="next" style="min-width:200px;">Continue</button>
+    </div>
+  </div>`);
+  const rewindBtn = wrap.querySelector("#rewind");
+  if (rewindBtn) {
+    rewindBtn.addEventListener("click", () => {
+      state.rewinding = true;
+      state.rewindAnswers = {};
+      state.activeTeamIndex = 0;
+      state.screen = "answerAll";
+      render();
+    });
+  }
+  wrap.querySelector("#next").addEventListener("click", () => { state.screen = "reflection"; render(); });
+  return wrap;
+}
+
+// ---------- REWIND RESULTS ----------
+
+function dceraTotal(dcera) { return DCERA_DIMS.reduce((sum, d) => sum + dcera[d.letter], 0); }
+
+function renderRewindResults() {
+  const s = currentScenario();
+  const rewind = state.rewound[s.id] || {};
+  const switched = state.teams.filter(t => rewind[t.id] && rewind[t.id] !== state.pendingAnswers[t.id]).length;
+  const wrap = el(`<div class="screen">
+    ${sessionHeader(progressDots(4))}
+    <span class="eyebrow rewind-eyebrow">Rewind</span>
+    <h2>${switched === 0 ? "Every team stayed with its first choice" : `${switched} of ${state.teams.length} ${state.teams.length === 1 ? "team" : "teams"} changed their mind`}</h2>
+    <p class="lead">Your score stays with your first answer. The rewind shows how your thinking moved once you knew what happens next.</p>
+    <div class="results-list">
+      ${state.teams.map((team, i) => {
+        const first = getChoice(s, state.pendingAnswers[team.id]);
+        const second = getChoice(s, rewind[team.id]);
+        const changed = first.id !== second.id;
+        return `<div class="result-card rewind-card" style="--team-color:${team.color}; animation-delay:${REDUCE_MOTION ? 0 : i * 0.12}s;">
+          <div class="result-head">
+            <span class="sb-dot" style="background:${team.color}; color:${team.color};"></span>
+            <span class="result-team">${team.name}</span>
+            <span class="rewind-verdict ${changed ? "changed" : ""}">${changed ? "Changed" : "Stayed"}</span>
+          </div>
+          <div class="rewind-row">
+            <div class="rewind-pick"><span class="rewind-label">First</span><span class="rewind-choice">${first.id}</span><span class="rewind-text">${first.text}</span><span class="rewind-total">DCERA ${dceraTotal(first.dcera)}</span></div>
+            ${changed ? `<div class="rewind-arrow" aria-hidden="true">→</div>
+            <div class="rewind-pick"><span class="rewind-label">Rewind</span><span class="rewind-choice">${second.id}</span><span class="rewind-text">${second.text}</span><span class="rewind-total">DCERA ${dceraTotal(second.dcera)}</span></div>` : ""}
+          </div>
+        </div>`;
+      }).join("")}
+    </div>
+    <div class="row" style="margin-top:1.5rem;">
       <div class="spacer"></div>
       <button class="btn btn-primary" id="next" style="min-width:200px;">Continue</button>
     </div>
@@ -659,12 +809,151 @@ function renderReflection() {
     <span class="eyebrow">The concept</span>
     <h2>What this scenario was really about</h2>
     <div class="consequence-box">${s.concept}</div>
+    ${isLessonMode() && s.lesson ? `
+      <div class="talk-box">
+        <span class="talk-label">Talk about it</span>
+        <ol class="talk-list">${s.lesson.prompts.map(p => `<li>${p.q}</li>`).join("")}</ol>
+      </div>` : ""}
     <div class="row" style="margin-top:1rem;">
       <div class="spacer"></div>
       <button class="btn btn-primary" id="next" style="min-width:200px;">Continue</button>
     </div>
   </div>`);
-  wrap.querySelector("#next").addEventListener("click", () => { state.screen = "takeaway"; render(); });
+  wrap.querySelector("#next").addEventListener("click", () => {
+    state.screen = isLessonMode() && s.lesson ? "examples" : "takeaway";
+    render();
+  });
+  return wrap;
+}
+
+// ---------- LESSON LAYER (Full lesson mode only) ----------
+
+function renderWarmup() {
+  const last = state.lastMission;
+  const when = last && last.date ? new Date(last.date).toLocaleDateString(undefined, { day: "numeric", month: "long" }) : "";
+  const wrap = el(`<div class="screen">
+    ${sessionHeader()}
+    <span class="eyebrow lesson-eyebrow">Warm-up</span>
+    <h1>Last time's mission</h1>
+    <blockquote class="mission-quote">${last.mission}</blockquote>
+    <p class="lead">From "${last.scenarioTitle}"${when ? `, ${when}` : ""}. Who noticed something? Two or three people share. There are no wrong answers.</p>
+    <div class="row" style="margin-top:1rem;">
+      <div class="spacer"></div>
+      <button class="btn btn-primary" id="next" style="min-width:240px;">Start today's scenario</button>
+    </div>
+  </div>`);
+  wrap.querySelector("#next").addEventListener("click", () => { state.screen = "hook"; render(); });
+  return wrap;
+}
+
+function renderExamples() {
+  const s = currentScenario();
+  const wrap = el(`<div class="screen">
+    ${sessionHeader(progressDots(6))}
+    <span class="eyebrow lesson-eyebrow">Worked examples</span>
+    <h2>What good looks like</h2>
+    <div class="lb-stack">${s.lesson.examples.map(lessonBlockHTML).join("")}</div>
+    <div class="row" style="margin-top:1rem;">
+      <div class="spacer"></div>
+      <button class="btn btn-primary" id="next" style="min-width:200px;">Continue</button>
+    </div>
+  </div>`);
+  wrap.querySelector("#next").addEventListener("click", () => {
+    state.practiceRound = 0;
+    state.screen = s.lesson.story ? "story" : "practice";
+    render();
+  });
+  return wrap;
+}
+
+function renderStory() {
+  const s = currentScenario();
+  const wrap = el(`<div class="screen">
+    ${sessionHeader(progressDots(6))}
+    <span class="eyebrow lesson-eyebrow">Example story</span>
+    ${lessonStoryHTML(s.lesson.story)}
+    <div class="row" style="margin-top:1rem;">
+      <div class="spacer"></div>
+      <button class="btn btn-primary" id="next" style="min-width:200px;">Time to practice</button>
+    </div>
+  </div>`);
+  wrap.querySelector("#next").addEventListener("click", () => { state.practiceRound = 0; state.screen = "practice"; render(); });
+  return wrap;
+}
+
+function renderPractice() {
+  const s = currentScenario();
+  const practice = s.lesson.practice;
+  const round = practice.rounds[state.practiceRound];
+  const isLastRound = state.practiceRound === practice.rounds.length - 1;
+  const clock = `${Math.floor(round.seconds / 60)}:${(round.seconds % 60).toString().padStart(2, "0")}`;
+  const wrap = el(`<div class="screen">
+    ${sessionHeader(progressDots(7))}
+    <span class="eyebrow lesson-eyebrow">Practice</span>
+    <h2>${practice.title}</h2>
+    <ol class="practice-steps">${practice.steps.map(step => `<li>${step}</li>`).join("")}</ol>
+    ${practice.rounds.length > 1 ? `<div class="round-pills">${practice.rounds.map((r, i) =>
+      `<span class="round-pill ${i === state.practiceRound ? "current" : ""} ${i < state.practiceRound ? "done" : ""}">${r.label}</span>`).join("")}</div>` : ""}
+    <div class="timer-row">
+      <div class="timer" id="timerDisplay">${clock}</div>
+      <div class="timer-track"><div class="timer-fill" id="timerBar" style="width:100%;"></div></div>
+    </div>
+    <div class="row" style="align-items:center;">
+      <button class="btn btn-ghost" id="skip">Skip practice</button>
+      <div class="spacer"></div>
+      <button class="btn btn-primary" id="next" style="min-width:220px;">${isLastRound ? "Continue" : practice.rounds[state.practiceRound + 1].label}</button>
+    </div>
+  </div>`);
+  mountTimer(wrap, round.seconds);
+  wrap.querySelector("#next").addEventListener("click", () => stopAndGo(() => {
+    if (isLastRound) state.screen = "exitCheck";
+    else state.practiceRound++;
+    render();
+  }));
+  wrap.querySelector("#skip").addEventListener("click", () => stopAndGo(() => { state.screen = "exitCheck"; render(); }));
+  return wrap;
+}
+
+function renderExitCheck() {
+  const s = currentScenario();
+  const picked = state.exitChecks[s.id];
+  const wrap = el(`<div class="screen">
+    ${sessionHeader(progressDots(8))}
+    <span class="eyebrow lesson-eyebrow">Exit check</span>
+    <h2>${s.lesson.exitCheck}</h2>
+    <p class="lead">Everyone holds up a hand. A fist means 0, all five fingers means 5. Teacher: tap roughly where the room landed.</p>
+    <div class="fist-row" role="radiogroup" aria-label="Class average">
+      ${[0, 1, 2, 3, 4, 5].map(n => `<button class="fist-btn ${picked === n ? "active" : ""}" data-n="${n}" role="radio" aria-checked="${picked === n}">${n}</button>`).join("")}
+    </div>
+    <div class="row" style="margin-top:1rem;">
+      <button class="btn btn-ghost" id="skip">Skip</button>
+      <div class="spacer"></div>
+      <button class="btn btn-primary" id="next" style="min-width:200px;" ${picked === undefined ? "disabled" : ""}>Continue</button>
+    </div>
+  </div>`);
+  wrap.querySelectorAll(".fist-btn").forEach(btn => {
+    btn.addEventListener("click", () => { state.exitChecks[s.id] = Number(btn.dataset.n); render(); });
+  });
+  const go = () => { state.screen = "mission"; render(); };
+  wrap.querySelector("#next").addEventListener("click", go);
+  wrap.querySelector("#skip").addEventListener("click", () => { delete state.exitChecks[s.id]; go(); });
+  return wrap;
+}
+
+function renderMission() {
+  const s = currentScenario();
+  saveMission(s);
+  const wrap = el(`<div class="screen">
+    ${sessionHeader(progressDots(9))}
+    <span class="eyebrow mission-eyebrow">Your Life Mission</span>
+    <p class="mission-text">${s.lesson.mission}</p>
+    <p class="lead">${classKey() ? "Next time this class plays, we'll start by asking how it went." : "Tip: give the class a name on the launcher, and next lesson will open with this mission."}</p>
+    <div class="row" style="margin-top:1rem;">
+      <div class="spacer"></div>
+      <button class="btn btn-primary" id="next" style="min-width:220px;">Finish lesson</button>
+    </div>
+  </div>`);
+  wrap.querySelector("#next").addEventListener("click", () => { state.screen = "debrief"; render(); });
   return wrap;
 }
 
@@ -716,19 +1005,35 @@ function computeWinners() {
 }
 
 function buildSyncPayload() {
+  const scenarioById = id => currentScenarios().find(s => s.id === id);
+  const rows = state.log.map(entry => {
+    const scenario = scenarioById(entry.scenarioId);
+    const team = state.teams.find(t => t.id === entry.teamId);
+    return {
+      team: team.name, scenario: scenario.title, choice: entry.choiceId,
+      D: entry.dcera.D, C: entry.dcera.C, E: entry.dcera.E, R: entry.dcera.R, A: entry.dcera.A
+    };
+  });
+  // Rewinds and exit checks reuse the Sheet's existing columns (the Apps
+  // Script only knows Team/Scenario/Choice/D-A), tagged in the Scenario
+  // column so they're easy to filter out of score totals.
+  Object.entries(state.rewound).forEach(([scenarioId, answers]) => {
+    const scenario = scenarioById(scenarioId);
+    Object.entries(answers).forEach(([teamId, choiceId]) => {
+      const team = state.teams.find(t => t.id === teamId);
+      const dcera = getChoice(scenario, choiceId).dcera;
+      rows.push({ team: team.name, scenario: `${scenario.title} (rewind)`, choice: choiceId, D: dcera.D, C: dcera.C, E: dcera.E, R: dcera.R, A: dcera.A });
+    });
+  });
+  Object.entries(state.exitChecks).forEach(([scenarioId, value]) => {
+    rows.push({ team: "Whole class", scenario: `${scenarioById(scenarioId).title} (exit check)`, choice: `${value} / 5`, D: "", C: "", E: "", R: "", A: "" });
+  });
   return {
     timestamp: new Date().toISOString(),
     className: state.className || "Unnamed class",
     module: currentModule().title,
     level: currentModule().levels[state.level].label,
-    rows: state.log.map(entry => {
-      const scenario = currentScenarios().find(s => s.id === entry.scenarioId);
-      const team = state.teams.find(t => t.id === entry.teamId);
-      return {
-        team: team.name, scenario: scenario.title, choice: entry.choiceId,
-        D: entry.dcera.D, C: entry.dcera.C, E: entry.dcera.E, R: entry.dcera.R, A: entry.dcera.A
-      };
-    })
+    rows
   };
 }
 
@@ -789,6 +1094,15 @@ function renderDebrief() {
   const winnerText = winners.length === 0 ? "" :
     winners.length === 1 ? `🏆 Nice work, ${winners[0].name}! You made the strongest choices today.` :
     `🏆 ${winners.map(w => w.name).join(" & ")}, you're tied for the win! Great choices, both of you.`;
+  const playedCount = new Set(state.log.map(e => e.scenarioId)).size || currentScenarios().length;
+  const lessonNotes = [];
+  Object.entries(state.exitChecks).forEach(([id, v]) => {
+    lessonNotes.push(`<b>Exit check</b> · ${currentScenarios().find(s => s.id === id).title}: the class landed at <b>${v} / 5</b>.`);
+  });
+  Object.entries(state.rewound).forEach(([id, answers]) => {
+    const changed = Object.entries(answers).filter(([teamId, c]) => c !== (state.log.find(e => e.scenarioId === id && e.teamId === teamId) || {}).choiceId).length;
+    lessonNotes.push(`<b>Rewind</b> · ${currentScenarios().find(s => s.id === id).title}: ${changed} of ${Object.keys(answers).length} teams changed their answer with hindsight.`);
+  });
 
   const wrap = el(`<div class="screen">
     ${sessionHeader()}
@@ -809,7 +1123,8 @@ function renderDebrief() {
         </tbody>
       </table>
     </div>
-    <p style="font-size:0.9rem; color:var(--ink-soft);">Total adds up every DCERA point from all ${currentScenarios().length} scenarios. The averages are right next to it. Want more detail? Check the full list below.</p>
+    <p style="font-size:0.9rem; color:var(--ink-soft);">Total adds up every DCERA point from ${playedCount === 1 ? "this scenario" : `all ${playedCount} scenarios`}. The averages are right next to it. Want more detail? Check the full list below.</p>
+    ${lessonNotes.length ? `<div class="card lesson-notes">${lessonNotes.map(n => `<p>${n}</p>`).join("")}</div>` : ""}
     <div class="card" style="overflow-x:auto;">
       <table>
         <thead><tr><th>Scenario</th><th>Team</th><th>Choice</th><th>D</th><th>C</th><th>E</th><th>R</th><th>A</th></tr></thead>

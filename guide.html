@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LIFE//SHIFT Teacher Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&display=swap">
+  <style>
+    /* Paper-first: this page is read on a laptop before class or printed,
+       never projected, so it uses a light palette instead of SYNTH. */
+    :root {
+      --paper: #FBF9FF;
+      --card: #FFFFFF;
+      --ink: #1B1230;
+      --ink-soft: #54486E;
+      --ink-faint: #6E6388;
+      --rule: #DDD5EC;
+      --magenta: #C2185B;
+      --violet: #5B2BD1;
+      --cyan: #00738A;
+      --amber: #9A5B00;
+      --mint: #0B7A45;
+      --font-display: "Anton", "Arial Narrow", Impact, sans-serif;
+      --font-mono: "Space Mono", ui-monospace, Menlo, monospace;
+      --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
+    .page { max-width: 880px; margin: 0 auto; padding: 2rem clamp(16px, 4vw, 32px) 4rem; display: flex; flex-direction: column; gap: 2rem; }
+    h1, h2 { font-family: var(--font-display); font-weight: 400; text-transform: uppercase; margin: 0; line-height: 1; letter-spacing: 0.01em; }
+    h1 { font-size: clamp(2.2rem, 6vw, 3.2rem); }
+    h2 { font-size: 1.8rem; }
+    h3 { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-faint); margin: 0 0 0.4rem; }
+    p { margin: 0; }
+    .brand { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--magenta); }
+    .sub { color: var(--ink-soft); }
+
+    .toolbar { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: flex-end; }
+    .toolbar label { display: flex; flex-direction: column; gap: 0.25rem; font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); }
+    select, input[type="text"] { font: inherit; font-size: 0.95rem; padding: 0.5rem 0.7rem; border: 1px solid var(--rule); background: var(--card); color: var(--ink); }
+    select:focus, input:focus, button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .print-btn { font-family: var(--font-mono); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.6rem 1.1rem; border: 1px solid var(--magenta); background: var(--magenta); color: #FFFFFF; cursor: pointer; }
+
+    .notice { border: 1px solid var(--rule); border-left: 3px solid var(--magenta); background: var(--card); padding: 0.9rem 1.1rem; font-size: 0.95rem; }
+
+    .box { background: var(--card); border: 1px solid var(--rule); padding: 1.2rem 1.4rem; }
+    .flow { width: 100%; border-collapse: collapse; font-size: 0.93rem; }
+    .flow td { padding: 0.45rem 0.4rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+    .flow tr:last-child td { border-bottom: none; }
+    .flow td:first-child { font-family: var(--font-mono); font-size: 0.82rem; color: var(--ink-faint); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .flow td:nth-child(2) { font-weight: 600; white-space: nowrap; }
+
+    .care { border: 1px solid #CFC2F2; background: #F4F0FF; padding: 1.2rem 1.4rem; display: flex; flex-direction: column; gap: 0.7rem; }
+    .care h3 { color: var(--violet); }
+    .care ol { margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.2rem; }
+    .contact { display: flex; flex-direction: column; gap: 0.25rem; }
+    .contact input { width: 100%; }
+    .phones { font-size: 0.9rem; color: var(--ink-soft); }
+    .phones b { font-family: var(--font-mono); color: var(--ink); }
+
+    .lesson { background: var(--card); border: 1px solid var(--rule); }
+    .lesson-head { padding: 1.1rem 1.4rem; border-bottom: 1px dashed var(--rule); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.4rem 1rem; align-items: baseline; }
+    .meta { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); }
+    .lesson-body { padding: 1.3rem 1.4rem 1.5rem; display: flex; flex-direction: column; gap: 1.3rem; }
+    .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem 1.6rem; }
+    .goal { border-left: 3px solid var(--cyan); padding-left: 0.9rem; }
+    .goal h3 { color: var(--cyan); }
+    .hook { font-style: italic; }
+    .focus b { font-family: var(--font-mono); }
+
+    .prompts { list-style: none; margin: 0; padding: 0; counter-reset: p; display: flex; flex-direction: column; gap: 0.7rem; }
+    .prompts li { counter-increment: p; display: grid; grid-template-columns: 1.6rem minmax(0, 1fr); }
+    .prompts li::before { content: counter(p); font-family: var(--font-mono); font-weight: 700; color: var(--cyan); }
+    .listen { display: block; font-size: 0.88rem; color: var(--ink-soft); }
+    .listen b { font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--cyan); margin-right: 0.3rem; }
+
+    .steps { margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.2rem; }
+    .mission { border-left: 3px solid var(--amber); padding-left: 0.9rem; font-weight: 500; }
+    .mission-h { color: var(--amber) !important; }
+    .scene-care { border: 1px solid #CFC2F2; background: #F4F0FF; padding: 0.8rem 1rem; font-size: 0.93rem; }
+    .scene-care h3 { color: var(--violet); }
+
+    /* shared lesson blocks (lesson-blocks.js) */
+    .lb { border: 1px solid var(--rule); padding: 0.9rem 1.1rem; display: flex; flex-direction: column; gap: 0.6rem; }
+    .lb + .lb { margin-top: 0.8rem; }
+    .lb-title { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--cyan); margin: 0; }
+    .lb-situation, .lb-note { color: var(--ink-soft); font-size: 0.93rem; }
+    .lb-rung { display: grid; grid-template-columns: 5rem minmax(0, 1fr); gap: 0.8rem; padding: 0.55rem 0; border-top: 1px solid var(--rule); }
+    .lb-best { border-left: 2px solid var(--mint); padding-left: 0.7rem; margin-left: -0.7rem; }
+    .lb-rung-label { font-family: var(--font-mono); font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); }
+    .lb-best .lb-rung-label { color: var(--mint); }
+    .lb-bars { display: flex; gap: 2px; margin-top: 0.25rem; }
+    .lb-bars i { width: 12px; height: 5px; border: 1px solid var(--rule); }
+    .lb-bars i.on { background: var(--magenta); border-color: var(--magenta); }
+    .lb-best .lb-bars i.on { background: var(--mint); border-color: var(--mint); }
+    .lb-meter { display: flex; flex-direction: column; }
+    .lb-quote { font-weight: 600; }
+    .lb-table { width: 100%; border-collapse: collapse; font-size: 0.93rem; }
+    .lb-table td { padding: 0.35rem 0.1rem; border-bottom: 1px solid var(--rule); }
+    .lb-table td:last-child { text-align: right; font-family: var(--font-mono); font-weight: 700; font-size: 0.85rem; }
+    .lb-tone-good td:last-child { color: var(--mint); }
+    .lb-tone-bad td:last-child { color: var(--magenta); }
+    .lb-items { margin: 0; padding-left: 1.2rem; }
+    .lb-pairs { display: flex; flex-direction: column; gap: 0.6rem; }
+    .lb-pair p { display: flex; gap: 0.6rem; align-items: baseline; }
+    .lb-tag { flex-shrink: 0; font-family: var(--font-mono); font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.05rem 0.4rem; border: 1px solid; display: inline-block; }
+    .lb-tag-myth { color: var(--magenta); }
+    .lb-tag-fact { color: var(--mint); }
+    .lb-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem; }
+    .lb-column { border: 1px solid var(--rule); padding: 0.7rem 0.9rem; display: flex; flex-direction: column; align-items: flex-start; gap: 0.3rem; }
+    .lb-column h4 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 1.1rem; text-transform: uppercase; }
+    .lb-column ul { margin: 0 0 0.3rem; padding-left: 1.1rem; font-size: 0.92rem; }
+    .lb-story { border-left: 3px solid var(--amber); }
+    .lb-story-label { font-family: var(--font-mono); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); }
+    .lb-story-body { font-style: italic; }
+    .lb-story-question { font-family: var(--font-mono); font-weight: 700; font-size: 0.88rem; color: var(--amber); }
+
+    .empty { color: var(--ink-soft); }
+
+    @media print {
+      body { background: #FFFFFF; font-size: 11.5pt; }
+      .page { padding: 0; max-width: none; gap: 1.2rem; }
+      .toolbar, .no-print { display: none !important; }
+      .lesson { break-before: page; border: none; }
+      .lesson-body { padding: 0.8rem 0 0; }
+      .lesson-head { padding: 0 0 0.6rem; }
+      .lb, .prompts li, .lb-rung, .care, .scene-care { break-inside: avoid; }
+      .contact input { border: none; padding: 0; font-weight: 600; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page" id="guide"></div>
+
+  <script src="content/decision-making.js"></script>
+  <script src="content/money-budgeting.js"></script>
+  <script src="content/communication-conflict.js"></script>
+  <script src="content/digital-citizenship.js"></script>
+  <script src="content/career-goals.js"></script>
+  <script src="content/swot-analysis.js"></script>
+  <script src="content/values-emotions.js"></script>
+  <script src="content/self-esteem-accountability.js"></script>
+  <script src="content/relationships-responsibility.js"></script>
+  <script src="content/guide-for-boys.js"></script>
+  <script src="content/digital-safety-girls.js"></script>
+  <script src="lesson-blocks.js"></script>
+  <script>
+    const MODULES = [
+      MODULE_DECISION_MAKING, MODULE_MONEY_BUDGETING, MODULE_COMMUNICATION_CONFLICT,
+      MODULE_DIGITAL_CITIZENSHIP, MODULE_CAREER_GOALS, MODULE_SWOT_ANALYSIS,
+      MODULE_VALUES_EMOTIONS, MODULE_SELF_ESTEEM_ACCOUNTABILITY, MODULE_RELATIONSHIPS_RESPONSIBILITY,
+      MODULE_GUIDE_FOR_BOYS, MODULE_DIGITAL_SAFETY_GIRLS
+    ];
+    const DIM_NAMES = { D: "Decision quality", C: "Consequence awareness", E: "Empathy", R: "Risk assessment", A: "Adaptability" };
+    const CONTACT_KEY = "hsl_counselor_contact";
+    const FLOW = [
+      ["00–03", "Warm-up", "The app shows last lesson's Life Mission (if this class has one). Two or three students share what they noticed."],
+      ["03–15", "Play", "Hook, 30 seconds alone, 1 minute as a team, every team locks in, results with DCERA scores. Offer Rewind if there's time."],
+      ["15–19", "Reflect", "The concept is named on screen for the first time. Ask the discussion prompts below."],
+      ["19–26", "Examples", "Go through the worked examples, then read the example story and ask its question."],
+      ["26–33", "Practice", "Run the practice activity on screen. The timer handles the rounds."],
+      ["33–37", "Exit check", "Everyone shows fist-to-five. Tap roughly where the room landed."],
+      ["37–40", "Life Mission", "Read the mission aloud. It opens the next lesson."]
+    ];
+
+    function readContact() { try { return localStorage.getItem(CONTACT_KEY) || ""; } catch (e) { return ""; } }
+    function writeContact(v) { try { localStorage.setItem(CONTACT_KEY, v); } catch (e) { /* not saved, still printable */ } }
+    function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;"); }
+
+    function render() {
+      const params = new URLSearchParams(location.search);
+      const mod = MODULES.find(m => m.id === params.get("module")) || MODULES[0];
+      const level = mod.levels[params.get("level")] ? params.get("level") : "L1";
+      const lvl = mod.levels[level];
+      const lessons = lvl.scenarios.map((s, i) => ({ s, i })).filter(x => x.s.lesson);
+
+      document.getElementById("guide").innerHTML = `
+        <header style="display:flex; flex-direction:column; gap:0.6rem;">
+          <span class="brand">LIFE//SHIFT · Teacher guide</span>
+          <h1>${mod.title}</h1>
+          <p class="sub">${lvl.label} · ${lessons.length} full ${lessons.length === 1 ? "lesson" : "lessons"}</p>
+        </header>
+
+        <div class="toolbar">
+          <label>Module
+            <select id="modSel">${MODULES.map(m => `<option value="${m.id}" ${m.id === mod.id ? "selected" : ""}>${m.title}</option>`).join("")}</select>
+          </label>
+          <label>Level
+            <select id="lvlSel">${Object.keys(mod.levels).map(k => `<option value="${k}" ${k === level ? "selected" : ""}>${mod.levels[k].label}</option>`).join("")}</select>
+          </label>
+          <button class="print-btn" id="printBtn">Print this guide</button>
+        </div>
+
+        <p class="notice no-print">This page is for you, not the class. It shows each lesson's goal and what to listen for, so keep it off the projector. Printing puts each lesson on its own page.</p>
+
+        <section class="box">
+          <h3>How a full lesson runs · 40 minutes</h3>
+          <table class="flow"><tbody>${FLOW.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("")}</tbody></table>
+        </section>
+
+        <section class="care">
+          <h3>If a student shares something serious</h3>
+          <ol>
+            <li>Thank them for telling you.</li>
+            <li>Don't ask for details in front of the class. Talk privately after.</li>
+            <li>Don't promise to keep it a secret. Say you'll need to tell someone who can help.</li>
+            <li>Tell the counselor the same day.</li>
+          </ol>
+          <div class="contact">
+            <label for="contact" class="meta">School counselor (name, room, hours)</label>
+            <input type="text" id="contact" placeholder="e.g. Ms. Sharma · Room 14 · 9 am to 3 pm" value="${esc(readContact())}">
+          </div>
+          <p class="phones">Helplines: Childline <b>1098</b> · Cybercrime <b>1930</b> · Women's Helpline <b>181</b></p>
+        </section>
+
+        ${lessons.length ? lessons.map(({ s, i }) => lessonCard(s, i, lvl)).join("") : `<p class="empty">Lesson plans for this module and level are coming soon. Decision-Making has them for both levels.</p>`}
+      `;
+
+      document.getElementById("modSel").addEventListener("change", e => go(e.target.value, "L1"));
+      document.getElementById("lvlSel").addEventListener("change", e => go(mod.id, e.target.value));
+      document.getElementById("printBtn").addEventListener("click", () => window.print());
+      document.getElementById("contact").addEventListener("input", e => {
+        writeContact(e.target.value);
+        document.querySelectorAll(".contact-echo").forEach(p => {
+          p.hidden = !e.target.value.trim();
+          p.querySelector("span").textContent = e.target.value;
+        });
+      });
+    }
+
+    function go(moduleId, level) {
+      history.replaceState(null, "", `?module=${moduleId}&level=${level}`);
+      render();
+    }
+
+    function lessonCard(s, i, lvl) {
+      const L = s.lesson;
+      const contact = readContact();
+      return `<article class="lesson">
+        <div class="lesson-head">
+          <h2>${i + 1}. ${s.title}</h2>
+          <span class="meta">${lvl.label.split(" · ").slice(0, 2).join(" · ")} · 40 min</span>
+        </div>
+        <div class="lesson-body">
+          <div class="goal"><h3>Goal · teacher only</h3><p>${L.goal}</p></div>
+
+          <div class="facts">
+            <div><h3>What students see first</h3><p class="hook">${s.hook}</p></div>
+            <div><h3>Core life skills</h3><p>${L.skills.join(" · ")}</p></div>
+            <div class="focus"><h3>DCERA focus</h3><p>${L.focus.map(f => `<b>${f}</b> ${DIM_NAMES[f]}`).join(" · ")}</p></div>
+            <div><h3>You need</h3><p>${L.needs}</p></div>
+          </div>
+
+          <div>
+            <h3>Discussion prompts</h3>
+            <ol class="prompts">${L.prompts.map(p => `<li><span>${p.q}<span class="listen"><b>Listen for</b>${p.listenFor}</span></span></li>`).join("")}</ol>
+          </div>
+
+          <div>
+            <h3>Worked examples</h3>
+            ${L.examples.map(lessonBlockHTML).join("")}
+            ${L.story ? `<div style="margin-top:0.8rem;">${lessonStoryHTML(L.story)}</div>` : ""}
+          </div>
+
+          <div class="facts">
+            <div>
+              <h3>Practice · ${L.practice.title}</h3>
+              <ol class="steps">${L.practice.steps.map(st => `<li>${st}</li>`).join("")}</ol>
+              <p class="meta" style="margin-top:0.4rem;">${L.practice.rounds.map(r => `${r.label} ${r.seconds}s`).join(" · ")}</p>
+            </div>
+            <div>
+              <h3>Exit check · fist-to-five</h3>
+              <p>${L.exitCheck}</p>
+            </div>
+          </div>
+
+          <div><h3 class="mission-h">Life Mission</h3><p class="mission">${L.mission}</p></div>
+
+          ${L.careNote ? `<div class="scene-care"><h3>Care note for this scenario</h3><p>${L.careNote}</p><p class="meta contact-echo" style="margin-top:0.3rem;" ${contact ? "" : "hidden"}>Counselor: <span>${esc(contact)}</span></p></div>` : ""}
+        </div>
+      </article>`;
+    }
+
+    render();
+  </script>
+</body>
+</html>
