@@ -1,5 +1,10 @@
 // Module: Values Clarification & Emotional Regulation
 // New module added 2026-08-18, following the established pattern.
+//
+// Lessons added 2026-10-23 (second module after the Decision-Making pilot):
+// every scenario carries a `lesson` object with the same shape documented in
+// content/decision-making.js. Care notes are on the four scenarios most
+// likely to surface something real (anger, being laughed at, panic, guilt).
 
 const MODULE_VALUES_EMOTIONS = {
   id: "values-emotions",
@@ -32,7 +37,55 @@ const MODULE_VALUES_EMOTIONS = {
             E: "The detention stays on your record. Weeks later you're still quietly annoyed every time you see that teacher."
           },
           concept: "Anger isn't the problem. It's useful information that something feels unfair to you. The skill is keeping the feeling separate from what you do next.",
-          takeaway: "What's your usual first move when you're angry? Did the choice you made today match that?"
+          takeaway: "What's your usual first move when you're angry? Did the choice you made today match that?",
+          lesson: {
+            goal: "Students practice keeping a strong feeling separate from their next action: pausing, then raising an unfair situation calmly and at the right time.",
+            skills: ["Coping with emotions", "Effective communication"],
+            focus: ["D", "A"],
+            needs: "The smartboard.",
+            careNote: "If a student says they feel this angry often, or that anger has led to fights or someone getting hurt, follow up privately and let the counselor know.",
+            prompts: [
+              { q: "What did your anger want you to do in the first ten seconds?", listenFor: "Shout, argue, storm out. Name these without judging them. The urge is normal." },
+              { q: "Why does waiting until after class work better than arguing right then?", listenFor: "The teacher isn't defending themselves in front of everyone. You're calmer. You can explain clearly." },
+              { q: "What's the difference between feeling angry and acting angry?", listenFor: "The feeling just shows up. The action is a choice." }
+            ],
+            examples: [
+              {
+                kind: "ladder",
+                title: "Say it like this",
+                situation: "Class is over. You go up to the teacher about the detention.",
+                rungs: [
+                  { label: "Weak", strength: 1, text: "\"This is so unfair. You always blame me.\"", note: "It starts a new argument. The teacher has to defend themselves instead of listening." },
+                  { label: "Clear", strength: 2, text: "\"I didn't do it. Can you check again?\"", note: "Calm and short. It might work, but the teacher still doesn't know what happened." },
+                  { label: "Strong", strength: 3, text: "\"Can I have one minute? I think there was a mix-up. Here's what actually happened.\"", note: "You ask first, stay calm, and give the teacher what they need to fix it." }
+                ]
+              },
+              {
+                kind: "list",
+                title: "When anger hits: the 3-step pause",
+                items: [
+                  "Notice it. Say in your head: \"I'm angry right now.\"",
+                  "Breathe out slowly, longer than you breathe in. Do it three times.",
+                  "Pick your moment. Ask yourself: \"Now, or after class?\""
+                ]
+              }
+            ],
+            story: {
+              body: "Dev got blamed for a broken chair in the lab. His face went hot and he wanted to shout. Instead he wrote one line in his notebook: \"Talk to Sir after class.\" When the bell rang, he walked up and explained. Sir checked with the lab assistant, and the detention was gone by lunch.",
+              question: "What did writing that one line do for Dev?"
+            },
+            practice: {
+              title: "Pause, then speak",
+              steps: [
+                "Get into pairs.",
+                "One of you is the teacher who blamed the wrong student. The other does the 3-step pause, then asks for one minute and explains calmly.",
+                "Swap when the timer ends."
+              ],
+              rounds: [{ label: "Round 1", seconds: 90 }, { label: "Swap roles", seconds: 90 }]
+            },
+            exitCheck: "How sure are you that you could pause before reacting the next time you're angry?",
+            mission: "This week, the next time you feel angry, try the 3-step pause once: notice it, breathe out slowly three times, then pick your moment. Notice what changes."
+          }
         },
         {
           id: "everyones-watching",
@@ -57,7 +110,55 @@ const MODULE_VALUES_EMOTIONS = {
             E: "The teacher eventually steps in, and the moment becomes the thing people remember about the presentation."
           },
           concept: "The freeze itself lasts only a few seconds. What people remember, including you, mostly comes down to what happens in the next thirty seconds.",
-          takeaway: "What would you want a friend to say to you, right after a moment like this?"
+          takeaway: "What would you want a friend to say to you, right after a moment like this?",
+          lesson: {
+            goal: "Students see that a freeze lasts seconds and the recovery is what people remember, and practice a short line plus a breath to get going again.",
+            skills: ["Coping with emotions", "Self-awareness"],
+            focus: ["A", "D"],
+            needs: "The smartboard.",
+            careNote: "If a student says people laugh at them often, or that they dread speaking in class because of how others treat them, follow up privately. It may be bullying, and the counselor should know.",
+            prompts: [
+              { q: "What felt worse: the freeze, or the laughing?", listenFor: "Being seen. Usually it's the audience, not the mistake." },
+              { q: "How long do you think the class remembers a few seconds of silence?", listenFor: "Not long. Most people are thinking about their own turn." },
+              { q: "What could the class do to make it easier for the person who freezes?", listenFor: "Not laughing, waiting, a small nod or smile. The room is part of this too." }
+            ],
+            examples: [
+              {
+                kind: "ladder",
+                title: "Get going again",
+                situation: "You freeze in the middle of your presentation. A few people laugh.",
+                rungs: [
+                  { label: "Weak", strength: 1, text: "(Standing silent, staring at the floor.)", note: "Every second feels longer, for you and for the room." },
+                  { label: "Clear", strength: 2, text: "\"Sorry. Okay.\" (Then rushing on.)", note: "You're moving again, but rushing often causes the next stumble." },
+                  { label: "Strong", strength: 3, text: "\"Give me a second.\" (One slow breath, a look at your notes, then carry on.)", note: "You name it, take back the pace, and the room relaxes with you." }
+                ]
+              },
+              {
+                kind: "mythfact",
+                title: "Myth or fact",
+                items: [
+                  { myth: "Everyone noticed and will remember it.", fact: "Most people barely notice a short pause. They're thinking about their own turn." },
+                  { myth: "If you freeze, you're bad at presenting.", fact: "Lots of good speakers freeze. What matters is having a way to start again." },
+                  { myth: "Laughing at someone is just a joke.", fact: "For the person up front, it can make a small moment feel huge. The audience has a job too." }
+                ]
+              }
+            ],
+            story: {
+              body: "Ishita lost her place in a science presentation and froze. Someone giggled. She said, \"Give me a second,\" looked at her card, and carried on. Afterward, her friend said, \"What freeze? I thought you were pausing on purpose.\"",
+              question: "Why did her friend barely notice?"
+            },
+            practice: {
+              title: "The ten-second restart",
+              steps: [
+                "Get into pairs.",
+                "One of you tells the other about your weekend. Partway through, the listener says \"Freeze!\"",
+                "The speaker says \"Give me a second,\" takes one slow breath, and carries on. Swap when the timer ends."
+              ],
+              rounds: [{ label: "Round 1", seconds: 90 }, { label: "Swap roles", seconds: 90 }]
+            },
+            exitCheck: "How ready are you to keep going if you freeze in front of the class?",
+            mission: "This week, when someone else stumbles while speaking, try being the friendly face: wait, don't laugh, maybe give a small nod. Notice what it's like to be that person in the room."
+          }
         },
         {
           id: "the-green-eyed-moment",
@@ -82,7 +183,54 @@ const MODULE_VALUES_EMOTIONS = {
             E: "The friendship never quite recovers its old closeness, and neither of you ever figures out exactly why."
           },
           concept: "Jealousy and real happiness for someone else aren't opposites. You can feel both at the same time. The mistake is thinking you have to pick just one to show.",
-          takeaway: "Has jealousy ever cost you a friendship you didn't mean to lose?"
+          takeaway: "Has jealousy ever cost you a friendship you didn't mean to lose?",
+          lesson: {
+            goal: "Students see that jealousy and being happy for someone can exist together, and practice saying both honestly without hurting the friend.",
+            skills: ["Coping with emotions", "Interpersonal relationships"],
+            focus: ["E", "D"],
+            needs: "The smartboard.",
+            prompts: [
+              { q: "Was the jealousy about your friend, or about what you wanted?", listenFor: "About what I wanted. The friend didn't take anything from me." },
+              { q: "Why does pretending feel safer than being honest?", listenFor: "Fear of seeming petty, or of losing the friend." },
+              { q: "What would you want a friend to say if it was the other way round?", listenFor: "Something honest and kind. Not a fake smile, and not silence." }
+            ],
+            examples: [
+              {
+                kind: "ladder",
+                title: "Say both feelings",
+                situation: "Your friend runs up to you: \"I got the lead role!\"",
+                rungs: [
+                  { label: "Weak", strength: 1, text: "\"Oh. Cool.\" (Then you walk off.)", note: "Your friend feels the chill and doesn't know why." },
+                  { label: "Clear", strength: 2, text: "\"That's great, congrats!\" (While you feel awful inside.)", note: "Kind, but the hidden feeling usually leaks out later." },
+                  { label: "Strong", strength: 3, text: "\"Honestly, I'm a bit jealous. I really wanted it. But I'm so happy for you. You're going to be great.\"", note: "Both feelings, said kindly. Most friends can handle that easily." }
+                ]
+              },
+              {
+                kind: "list",
+                title: "Jealousy check: three questions",
+                items: [
+                  "What did I actually want?",
+                  "Did my friend take it from me, or did they just get it?",
+                  "What's one step I can take toward what I want?"
+                ]
+              }
+            ],
+            story: {
+              body: "Ravi didn't make the school football team. His best friend did. For a week, Ravi made excuses not to hang out. Then he said, \"I was jealous, man. Sorry I went quiet.\" His friend laughed: \"I thought you were mad at me!\" They practiced together every Saturday after that.",
+              question: "What did a week of silence cost both of them?"
+            },
+            practice: {
+              title: "Say both",
+              steps: [
+                "Get into pairs.",
+                "One of you shares some good news. Made up is fine. The other answers with both feelings: one honest, one kind.",
+                "Swap when the timer ends."
+              ],
+              rounds: [{ label: "Round 1", seconds: 90 }, { label: "Swap roles", seconds: 90 }]
+            },
+            exitCheck: "How comfortable are you now with saying both feelings to a friend?",
+            mission: "This week, notice one moment of jealousy, even a small one. Ask yourself: \"What did I actually want?\" You don't have to tell anyone."
+          }
         }
       ]
     },
@@ -112,7 +260,53 @@ const MODULE_VALUES_EMOTIONS = {
             E: "You get through the first few questions fine, then visibly lose your calm partway through."
           },
           concept: "Panic is a physical state, not proof of whether you're ready. The fastest way out of it is almost never more thinking. It's something that works directly on the body.",
-          takeaway: "What's actually worked for you before, in a moment like this?"
+          takeaway: "What's actually worked for you before, in a moment like this?",
+          lesson: {
+            goal: "Students see that panic is a body state rather than a verdict on how ready they are, and practice two quick body-first tools for high-pressure moments.",
+            skills: ["Coping with stress", "Self-awareness"],
+            focus: ["D", "R"],
+            needs: "The smartboard.",
+            careNote: "If a student describes panic that happens often, panic attacks, or anxiety that stops them from going to school or sitting exams, take it seriously and connect them with the counselor.",
+            prompts: [
+              { q: "What does your body do when you panic?", listenFor: "Fast heart, shaky hands, dry mouth, racing mind. All normal stress responses." },
+              { q: "Why doesn't more revising help in the last ten minutes?", listenFor: "The mind is already full. Panic isn't a knowledge problem." },
+              { q: "What's worked for you before, even a little?", listenFor: "Breathing, music, walking, talking to someone. Collect these on the board." }
+            ],
+            examples: [
+              {
+                kind: "list",
+                title: "Two tools for the last ten minutes",
+                items: [
+                  "Slow breathing: breathe in for 4, breathe out for 6. Keep going for one minute. A longer breath out helps your body calm down.",
+                  "5-4-3-2-1: name 5 things you can see, 4 you can touch, 3 you can hear, 2 you can smell, and 1 you can taste. It pulls your mind back into the room."
+                ]
+              },
+              {
+                kind: "mythfact",
+                title: "Myth or fact",
+                items: [
+                  { myth: "If I'm this nervous, I'm not ready.", fact: "Nerves show up for things you care about. They say nothing about how prepared you are." },
+                  { myth: "Calm people don't feel panic.", fact: "Most people feel it. Calm people have a few tools for getting through it." },
+                  { myth: "One more read of my notes will fix it.", fact: "In the last few minutes, a calmer body helps more than more information." }
+                ]
+              }
+            ],
+            story: {
+              body: "Aanya sat outside the interview room reading the same line of her notes again and again. Her hands were shaking. She put the notes away, breathed in for 4 and out for 6, and named things she could see: a clock, a plant, a poster. When they called her name, her heart was still fast, but she could think.",
+              question: "Did the panic go away completely? Did it need to?"
+            },
+            practice: {
+              title: "One calm minute",
+              steps: [
+                "Everyone together, sitting down.",
+                "Round 1: slow breathing. In for 4, out for 6. The teacher counts out loud.",
+                "Round 2: 5-4-3-2-1, silently, in your head. Afterward, share which tool felt better."
+              ],
+              rounds: [{ label: "Slow breathing", seconds: 60 }, { label: "5-4-3-2-1", seconds: 60 }]
+            },
+            exitCheck: "How ready do you feel to calm your body down before your next big moment?",
+            mission: "This week, try one minute of slow breathing before something that makes you nervous: a test, a call, a match. Notice what changes in your body."
+          }
         },
         {
           id: "when-youre-the-one-who-messed-up",
@@ -137,7 +331,56 @@ const MODULE_VALUES_EMOTIONS = {
             E: "The fix happens, but the team is confused about what happened and whether it will happen again."
           },
           concept: "Guilt that turns into clear ownership helps everyone move forward. Guilt that turns into a performance for others to manage just adds a second problem on top of the first.",
-          takeaway: "What's the difference between taking responsibility and punishing yourself?"
+          takeaway: "What's the difference between taking responsibility and punishing yourself?",
+          lesson: {
+            goal: "Students practice turning guilt into clear ownership: one direct apology, a plan to fix what's still fixable, and no self-punishment.",
+            skills: ["Coping with emotions", "Effective communication"],
+            focus: ["D", "C"],
+            needs: "The smartboard. Paper and a pen for each team.",
+            careNote: "If a student talks about punishing themselves, feeling worthless after mistakes, or hurting themselves, treat it as serious. Thank them, don't press for details in class, and tell the counselor the same day.",
+            prompts: [
+              { q: "What does guilt make you want to do?", listenFor: "Hide, over-apologize, explain. Name these as normal." },
+              { q: "Why does an excuse before an apology land badly?", listenFor: "It sounds like you care more about the blame than about the team." },
+              { q: "What's the difference between taking responsibility and punishing yourself?", listenFor: "Responsibility fixes things and moves on. Punishing yourself keeps the focus on you." }
+            ],
+            examples: [
+              {
+                kind: "ladder",
+                title: "Own it in one message",
+                situation: "You missed the deadline. Your team's group chat has gone quiet.",
+                rungs: [
+                  { label: "Weak", strength: 1, text: "\"I'm so sorry, I'm the worst, I ruin everything, I'm so so sorry\"", note: "Now your team has to comfort you instead of fixing the project." },
+                  { label: "Clear", strength: 2, text: "\"Sorry, I had a lot going on this week.\"", note: "Maybe true. But it sounds like an excuse." },
+                  { label: "Strong", strength: 3, text: "\"I missed the deadline, that's on me. I can finish my part by 6 pm today. Can someone check the slides with me at 7?\"", note: "Owns it once, gives a fix and a time, and asks for what you need." }
+                ]
+              },
+              {
+                kind: "list",
+                title: "The ownership formula",
+                items: [
+                  "Say what happened in one sentence, starting with \"I\".",
+                  "Say what you'll do, and by when.",
+                  "Ask for the one thing you need.",
+                  "Then stop apologizing and get to work."
+                ]
+              }
+            ],
+            story: {
+              body: "Kiran forgot to book the hall for the class event. He felt sick about it. He wrote to the class rep: \"I forgot to book the hall. My mistake. I've emailed the office and I'll go in at 8 am to sort it.\" The hall got booked for the next day. Nobody brought it up again.",
+              question: "Why did nobody bring it up again?"
+            },
+            practice: {
+              title: "Write the message",
+              steps: [
+                "Work as a team.",
+                "Your team missed a deadline because of one person. Write the message that person should send, using the ownership formula.",
+                "Read it out. The class checks: did it own it once, give a fix, and stop?"
+              ],
+              rounds: [{ label: "Write it", seconds: 90 }]
+            },
+            exitCheck: "How sure are you that you could own a mistake without beating yourself up?",
+            mission: "This week, the next time you get something wrong, even something small, say it in one sentence with \"I\" and a fix. Then let it go."
+          }
         },
         {
           id: "the-argument-you-didnt-start",
@@ -162,7 +405,54 @@ const MODULE_VALUES_EMOTIONS = {
             E: "Word gets back to the coworker secondhand, and now there are two unresolved tensions instead of one."
           },
           concept: "Not reacting in the heated moment isn't the same as ignoring it. When you respond matters just as much as what you say.",
-          takeaway: "What's your usual gap between feeling provoked and actually responding? Is that gap working for you?"
+          takeaway: "What's your usual gap between feeling provoked and actually responding? Is that gap working for you?",
+          lesson: {
+            goal: "Students practice separating the heated moment from the real conversation: staying steady in public, then raising it privately, calmly, and specifically.",
+            skills: ["Coping with emotions", "Effective communication"],
+            focus: ["D", "E"],
+            needs: "The smartboard.",
+            prompts: [
+              { q: "What would snapping back have won you?", listenFor: "A few seconds of feeling better. Usually nothing else." },
+              { q: "Why does a private conversation later work better?", listenFor: "Nobody has to save face, and both people are calmer." },
+              { q: "When should you not wait, and speak up or get help right away?", listenFor: "If you feel unsafe, if it's abusive or discriminatory, or if waiting lets real harm happen. Then involve a manager or a trusted adult." }
+            ],
+            examples: [
+              {
+                kind: "ladder",
+                title: "The later conversation",
+                situation: "An hour later, you find the coworker on their own.",
+                rungs: [
+                  { label: "Weak", strength: 1, text: "\"You were really rude earlier. What's your problem?\"", note: "It starts round two of the argument." },
+                  { label: "Clear", strength: 2, text: "\"About earlier, that wasn't my fault.\"", note: "Fair, but they may get defensive with nothing else to go on." },
+                  { label: "Strong", strength: 3, text: "\"Got a minute? Earlier, what you said in front of everyone felt unfair. The delay came from the printer. Can we agree how to flag things like that next time?\"", note: "Specific, calm, about what happened, and it looks forward." }
+                ]
+              },
+              {
+                kind: "list",
+                title: "Buy yourself time in the moment",
+                items: [
+                  "\"Let me look into that and get back to you.\"",
+                  "\"Can we talk about this in a bit?\"",
+                  "Take one slow breath before you say anything at all."
+                ]
+              }
+            ],
+            story: {
+              body: "At her weekend café job, Neha's manager snapped at her about a wrong order that wasn't hers. She said, \"I'll check what happened,\" and kept working. After the rush, she showed him the order slip. He looked at it, sighed, and said, \"Sorry. Long day.\"",
+              question: "What made the later conversation easier for both of them?"
+            },
+            practice: {
+              title: "The second conversation",
+              steps: [
+                "Get into pairs.",
+                "One of you is the coworker who snapped. The other starts the private conversation, using the strong example as a guide.",
+                "Swap when the timer ends."
+              ],
+              rounds: [{ label: "Round 1", seconds: 90 }, { label: "Swap roles", seconds: 90 }]
+            },
+            exitCheck: "How confident are you that you could stay steady now and raise it later?",
+            mission: "This week, notice the gap between being provoked and answering back. If you can, stretch it by one breath before you respond."
+          }
         }
       ]
     }

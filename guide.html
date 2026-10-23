@@ -215,7 +215,7 @@
           <p class="phones">Helplines: Childline <b>1098</b> · Cybercrime <b>1930</b> · Women's Helpline <b>181</b></p>
         </section>
 
-        ${lessons.length ? lessons.map(({ s, i }) => lessonCard(s, i, lvl)).join("") : `<p class="empty">Lesson plans for this module and level are coming soon. Decision-Making has them for both levels.</p>`}
+        ${lessons.length ? lessons.map(({ s, i }) => lessonCard(s, i, lvl)).join("") : `<p class="empty">Lesson plans for this module and level are coming soon. Ready now: ${MODULES.filter(m => Object.values(m.levels).some(l => l.scenarios.some(s => s.lesson))).map(m => m.title).join(", ")}.</p>`}
       `;
 
       document.getElementById("modSel").addEventListener("change", e => go(e.target.value, "L1"));

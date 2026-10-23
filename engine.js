@@ -173,6 +173,9 @@ function getCallbackText(scenario, choice, teamId) {
   return "";
 }
 function lessonReady() { return currentScenarios().some(s => s.lesson); }
+function modulesWithLessons() {
+  return AVAILABLE_MODULES.filter(m => Object.values(m.levels).some(l => l.scenarios.some(s => s.lesson))).map(m => m.title);
+}
 function isLessonMode() { return state.mode === "lesson" && lessonReady(); }
 
 // Last Life Mission per class, so the next lesson can open with it. Keyed by
@@ -358,7 +361,7 @@ function renderLauncher() {
         <button class="mode-option ${isLessonMode() ? "active" : ""}" data-mode="lesson" role="radio" aria-checked="${isLessonMode()}" ${lessonReady() ? "" : "disabled"}>
           <span class="mode-title">Full lesson</span>
           <span class="mode-desc">One scenario, about 40 minutes. Adds examples, practice, an exit check, and a Life Mission.</span>
-          ${lessonReady() ? "" : `<span class="mode-soon">Lesson plans are ready for Decision-Making so far.</span>`}
+          ${lessonReady() ? "" : `<span class="mode-soon">Lesson plans so far: ${modulesWithLessons().join(", ")}.</span>`}
         </button>
         <button class="mode-option ${isLessonMode() ? "" : "active"}" data-mode="quick" role="radio" aria-checked="${!isLessonMode()}">
           <span class="mode-title">Quick play</span>
