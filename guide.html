@@ -44,6 +44,8 @@
     .print-btn { font-family: var(--font-mono); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.6rem 1.1rem; border: 1px solid var(--magenta); background: var(--magenta); color: #FFFFFF; cursor: pointer; }
 
     .notice { border: 1px solid var(--rule); border-left: 3px solid var(--magenta); background: var(--card); padding: 0.9rem 1.1rem; font-size: 0.95rem; }
+    .notice.counselor-led { border-color: #CFC2F2; border-left-color: var(--violet); background: #F4F0FF; }
+    .notice.counselor-led b { color: var(--violet); }
 
     .box { background: var(--card); border: 1px solid var(--rule); padding: 1.2rem 1.4rem; }
     .flow { width: 100%; border-collapse: collapse; font-size: 0.93rem; }
@@ -192,6 +194,8 @@
           </label>
           <button class="print-btn" id="printBtn">Print this guide</button>
         </div>
+
+        ${mod.counselorLed ? `<p class="notice counselor-led"><b>Counselor-led module.</b> Run these lessons with the school counselor or a trained teacher in the room. Students may share real experiences, so read every care note before class.</p>` : ""}
 
         <p class="notice no-print">This page is for you, not the class. It shows each lesson's goal and what to listen for, so keep it off the projector. Printing puts each lesson on its own page.</p>
 
