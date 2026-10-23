@@ -15,10 +15,20 @@
 // are included in-app, not just documented elsewhere — see the concept text
 // in "If I Tell, What Happens?"; (3) anti-shame framing throughout, echoing
 // the source guide's own facilitation language almost verbatim.
+//
+// Lessons added 2026-10-23 (ninth module with lessons), same `lesson` shape
+// as content/decision-making.js, with the sensitive-module rules: a care
+// note on every lesson, written practice only (nobody plays the other
+// person), "No." shown as complete, and `counselorLed: true` for the guide
+// banner. The toolkit's Message Decoder returns as a paper activity. The
+// evidence lesson separates saving messages and usernames (helpful) from
+// forwarding images (never, even to report). Existing scenario text,
+// including the helpline concept, is untouched.
 
 const MODULE_DIGITAL_SAFETY_GIRLS = {
   id: "digital-safety-girls",
   title: "Digital Safety for Girls",
+  counselorLed: true,
   coreIdea: "Recognizing a pattern is a skill, not a character test.",
   levels: {
     L1: {
@@ -47,7 +57,55 @@ const MODULE_DIGITAL_SAFETY_GIRLS = {
             E: "It takes an extra step, but a second set of eyes often catches things you've stopped noticing about your own profile."
           },
           concept: "None of these choices are about hiding. They're about deciding on purpose what a stranger gets to know about you, instead of leaving it up to whoever bothers to look.",
-          takeaway: "If you looked at your own profile as a stranger would, what would you actually learn?"
+          takeaway: "If you looked at your own profile as a stranger would, what would you actually learn?",
+          lesson: {
+            goal: "Students decide on purpose what a stranger can learn from their profile, using two protections together: who can see it, and what's in it.",
+            skills: ["Critical thinking", "Decision making"],
+            focus: ["R", "C"],
+            needs: "The smartboard. Paper and a pen for each team.",
+            careNote: "If a student mentions a stranger who already seems to know where they live or study, or who has turned up in person, treat it as urgent and tell the counselor the same day.",
+            prompts: [
+              { q: "What could a stranger learn from a public profile alone?", listenFor: "School, city, age, friends, and daily routine from photos." },
+              { q: "Is a private account enough on its own?", listenFor: "No. What's inside it still matters if someone gets access." },
+              { q: "Who could look over your profile with you?", listenFor: "A parent, an older sibling or cousin, a trusted friend." }
+            ],
+            examples: [
+              {
+                kind: "list",
+                title: "Two protections, together",
+                items: [
+                  "Who can see it: make the account private, and check who your followers actually are.",
+                  "What's in it: leave out your school, birthday, phone number, and live location.",
+                  "Photos: check the background for school uniforms, house numbers, and street signs."
+                ]
+              },
+              {
+                kind: "ladder",
+                title: "Write a safer bio",
+                situation: "Your new profile bio.",
+                rungs: [
+                  { label: "Weak", strength: 1, text: "\"Ananya | Class 9, [school name] | Born 3 March | Delhi\"", note: "School, age, birthday and city. A stranger could sound like they already know you." },
+                  { label: "Clear", strength: 2, text: "\"Ananya | Delhi\"", note: "Much less to go on." },
+                  { label: "Strong", strength: 3, text: "\"Ananya ✨ books, badminton, bad jokes\"", note: "Shows who you are, not where to find you." }
+                ]
+              }
+            ],
+            story: {
+              body: "Before making her first account, Nisha asked her older cousin to look it over with her. Her cousin spotted the school logo on her blazer in two photos, and the name of her apartment building in another. Nisha swapped the photos. It took ten minutes.",
+              question: "Why was a second pair of eyes so useful?"
+            },
+            practice: {
+              title: "Stranger's-eye view",
+              steps: [
+                "Work as a team.",
+                "Make up a profile for a fake student: a bio and three photo descriptions.",
+                "Swap with another team. List everything a stranger could learn, and suggest one fix for each."
+              ],
+              rounds: [{ label: "Make it", seconds: 90 }, { label: "Swap and check", seconds: 90 }]
+            },
+            exitCheck: "How sure are you about what a stranger can learn from your profile?",
+            mission: "This week, look at your own profile the way a stranger would. Remove or hide one thing they don't need to know."
+          }
         },
         {
           id: "someone-new-who-gets-it",
@@ -74,7 +132,54 @@ const MODULE_DIGITAL_SAFETY_GIRLS = {
             F: "The adult doesn't overreact. They ask a few questions and suggest keeping an eye on it together. It feels much less dramatic than you expected."
           },
           concept: "'You're different from everyone else' feels like being truly seen. But it's also one of the most common opening lines in exactly the kind of relationship this module is about. Feeling true and being used are not opposites.",
-          takeaway: "What's a question you could ask early on that would tell you a lot about whether someone is being honest with you?"
+          takeaway: "What's a question you could ask early on that would tell you a lot about whether someone is being honest with you?",
+          lesson: {
+            goal: "Students learn that feeling understood quickly can be real or can be a tactic, and practice testing a new online friend's story and keeping an adult in the loop early.",
+            skills: ["Critical thinking", "Self-awareness"],
+            focus: ["R", "D"],
+            needs: "The smartboard. Paper and a pen for each team.",
+            careNote: "Students may feel embarrassed if they recognize a current online friendship here. Keep the tone free of blame. If a student shares worries about a real online contact, thank them and tell the counselor the same day.",
+            prompts: [
+              { q: "What does \"you're different from everyone else\" do to how much you trust someone?", listenFor: "It feels special, so you trust them faster." },
+              { q: "Is there anything wrong with this friendship yet?", listenFor: "Not necessarily. That's why noticing and checking matter." },
+              { q: "Why tell an adult when nothing seems wrong?", listenFor: "It's easier early, and you're not alone if things change." }
+            ],
+            examples: [
+              {
+                kind: "list",
+                title: "Questions that test a story",
+                items: [
+                  "\"Which school do you go to? Who do you know there?\"",
+                  "\"Do we have any friends in common I could ask about you?\"",
+                  "\"Why do you want to talk to me, out of everyone online?\""
+                ]
+              },
+              {
+                kind: "mythfact",
+                title: "Myth or fact",
+                items: [
+                  { myth: "If they really understand you, they must be genuine.", fact: "Feeling understood is real. But people who want something can learn to say exactly the right things." },
+                  { myth: "Telling an adult means you think something's wrong.", fact: "It just means someone else knows. That's normal, and it's easiest early." },
+                  { myth: "You'd definitely know if someone was fake.", fact: "Fake profiles can be very convincing. Checking someone's story is a skill, not paranoia." }
+                ]
+              }
+            ],
+            story: {
+              body: "Ira met someone online who loved the same band, remembered her exam dates, and said she was more mature than girls her age. She told her elder sister, \"There's someone I've been talking to.\" Her sister asked one question: \"Do you have any friends in common?\" They didn't, and his story about his school didn't match the school's website. Ira stopped replying.",
+              question: "What made her sister's question so useful?"
+            },
+            practice: {
+              title: "Notice the moves",
+              steps: [
+                "Work as a team.",
+                "Write three things a new online friend might say that feel nice but could also be a tactic, like \"Nobody gets you like I do.\"",
+                "Next to each one, write a question you could ask, or a person you could tell."
+              ],
+              rounds: [{ label: "Write them", seconds: 90 }]
+            },
+            exitCheck: "How confident are you that you'd notice an online friendship moving too fast?",
+            mission: "This week, think of one adult you'd tell about a new online friend, even if nothing seemed wrong. You don't have to tell anyone who."
+          }
         },
         {
           id: "the-secret-between-us",
@@ -101,7 +206,55 @@ const MODULE_DIGITAL_SAFETY_GIRLS = {
             F: "The adult recognizes the request for what it is and helps you think through what to do next."
           },
           concept: "A request for secrecy is rarely about making the relationship special. It's usually about removing the people most likely to notice something's wrong.",
-          takeaway: "Who in your life would you actually want to know about a new friendship like this?"
+          takeaway: "Who in your life would you actually want to know about a new friendship like this?",
+          lesson: {
+            goal: "Students learn that a request to keep a friendship secret from family and friends is a warning sign, and practice a clear response and telling a trusted adult.",
+            skills: ["Critical thinking", "Decision making"],
+            focus: ["R", "D"],
+            needs: "The smartboard. Paper and a pen for each team.",
+            careNote: "If a student says someone online has asked them to keep things secret from family, take it seriously. Thank them, don't ask for details in class, and tell the counselor the same day.",
+            prompts: [
+              { q: "Why would a healthy friendship need to be secret?", listenFor: "It wouldn't. Surprises are fine. Secrets from everyone who cares about you aren't." },
+              { q: "What does \"they wouldn't get it\" assume about your family?", listenFor: "That they're against you. It cuts you off from help." },
+              { q: "What's the difference between a surprise and a secret?", listenFor: "A surprise ends happily, and soon. A secret is meant to stay hidden." }
+            ],
+            examples: [
+              {
+                kind: "ladder",
+                title: "Answer the request",
+                situation: "\"Don't tell your parents about me, okay? They wouldn't get it. This is just between us.\"",
+                rungs: [
+                  { label: "Weak", strength: 1, text: "\"Okay, I won't.\"", note: "Now the people most likely to notice a problem are cut out." },
+                  { label: "Enough", strength: 3, text: "\"I don't keep people in my life secret from my family.\"", note: "A clear boundary. How they respond tells you a lot." },
+                  { label: "Enough, and telling", strength: 3, text: "\"I don't keep secrets like that.\" (Then telling a parent or trusted adult about the request.)", note: "The boundary, plus someone on your side." }
+                ]
+              },
+              {
+                kind: "list",
+                title: "Secret or surprise?",
+                items: [
+                  "A surprise is fun, and everyone finds out soon, like a birthday party.",
+                  "A secret is meant to stay hidden, especially from the people who look after you.",
+                  "Anyone who asks you to keep them secret from your family is asking for a secret, not a surprise."
+                ]
+              }
+            ],
+            story: {
+              body: "An online friend kept telling Pooja, \"Your parents are too strict. Let's keep this between us.\" Pooja mentioned it to her school counselor, almost as a joke. The counselor didn't laugh or panic. She said, \"That request is a warning sign. Let's look at it together.\" Pooja says that was the moment it stopped feeling special and started feeling off.",
+              question: "Why did the counselor's calm reaction matter?"
+            },
+            practice: {
+              title: "Write the boundary",
+              steps: [
+                "Work as a team.",
+                "Write a short reply to \"don't tell your parents about me,\" in your own words.",
+                "Add one kind of adult you could tell: a parent, an aunt, a teacher, the counselor. Share your reply."
+              ],
+              rounds: [{ label: "Write it", seconds: 90 }]
+            },
+            exitCheck: "How sure are you that you'd recognize a request for secrecy as a warning sign?",
+            mission: "This week, notice the difference between surprises and secrets around you. If anyone ever asks you to hide a friendship from your family, tell a trusted adult."
+          }
         },
         {
           id: "everyones-doing-it-kind-of",
@@ -128,7 +281,56 @@ const MODULE_DIGITAL_SAFETY_GIRLS = {
             F: "The adult doesn't need names to start reminding people what to watch for. Now they're ready to help if something comes up."
           },
           concept: "Friend group joking about 'talking to someone online' is often the only moment a warning sign ever comes up. Most of it passes by exactly like this, as a joke nobody follows up on.",
-          takeaway: "Has a joke in a group chat ever turned out to be about something real?"
+          takeaway: "Has a joke in a group chat ever turned out to be about something real?",
+          lesson: {
+            goal: "Students practice turning a group-chat joke into a real one-on-one check-in, and learn they can tell an adult about a worry without naming anyone.",
+            skills: ["Empathy", "Interpersonal relationships"],
+            focus: ["E", "D"],
+            needs: "The smartboard. Paper and a pen for each pair.",
+            careNote: "If a student is worried about a specific friend's online contact, they don't have to name the friend in class. Invite them to talk privately, and tell the counselor.",
+            prompts: [
+              { q: "Why do worries come up as jokes?", listenFor: "It feels safer. You can test the reaction without committing." },
+              { q: "How would you know if a friend's \"someone online\" was a real concern?", listenFor: "Secrecy, gifts, pressure, changes in mood. Ask privately." },
+              { q: "Can you tell an adult without getting a friend in trouble?", listenFor: "Yes. You can speak generally, and the adult can help carefully." }
+            ],
+            examples: [
+              {
+                kind: "ladder",
+                title: "Check in privately",
+                situation: "After the group chat, you message your friend on her own.",
+                rungs: [
+                  { label: "Weak", strength: 1, text: "\"lol so who's your mystery guy 👀\"", note: "Keeps it a joke, so she'll answer like it's a joke." },
+                  { label: "Clear", strength: 2, text: "\"Is the online guy legit?\"", note: "Direct, but it can sound like you're judging her." },
+                  { label: "Strong", strength: 3, text: "\"Hey, just checking. How's it going with the person you've been talking to? You can tell me anything, no judgement.\"", note: "Private and warm, and it makes it easy to say if something feels off." }
+                ]
+              },
+              {
+                kind: "list",
+                title: "Worth a second look",
+                items: [
+                  "They want it kept secret.",
+                  "They give gifts, money, or phone recharges.",
+                  "They ask for photos, or to meet somewhere they choose.",
+                  "Your friend seems worried or jumpy, or can't put her phone down."
+                ]
+              }
+            ],
+            story: {
+              body: "In the group chat, everyone teased Riya about her \"online boyfriend.\" Later, Neha messaged her on her own: \"Just checking, is it all okay with him?\" Riya replied, \"Honestly, he's been asking for photos and I don't know what to do.\" Neha went with her to the counselor the next morning.",
+              question: "Why did Riya tell Neha the truth, but not the group?"
+            },
+            practice: {
+              title: "The private message",
+              steps: [
+                "Get into pairs.",
+                "Together, write the private message you'd send to a friend who's been joking about \"someone online.\" Keep it warm, with no judgement.",
+                "Then write what you'd say if she told you something felt wrong. Share one line."
+              ],
+              rounds: [{ label: "Write it", seconds: 90 }]
+            },
+            exitCheck: "How confident are you that you could check in on a friend privately?",
+            mission: "This week, send one friend a message that's just a check-in: \"How are you actually doing?\""
+          }
         }
       ]
     },
@@ -158,7 +360,63 @@ const MODULE_DIGITAL_SAFETY_GIRLS = {
             E: "It might end the conversation, but confronting someone using these tactics directly can also make the 'upset if you stop talking' pressure worse."
           },
           concept: "This exact pattern happens so often it has a name: flattery, then a request framed as 'just between us,' then guilt about pulling away. Recognizing it is a skill. It's not proof that anything about you invited it.",
-          takeaway: "Which single message in that thread would you point to as the moment it stopped being just a conversation?"
+          takeaway: "Which single message in that thread would you point to as the moment it stopped being just a conversation?",
+          lesson: {
+            goal: "Students learn to recognize a common grooming pattern (flattery, a \"just between us\" request, then guilt about pulling away) and practice the response: save the messages and tell a trusted adult.",
+            skills: ["Critical thinking", "Decision making"],
+            focus: ["R", "C"],
+            needs: "The smartboard. Paper and a pen for each team.",
+            careNote: "Keep everything general and non-graphic, as the scenario does. If a student recognizes this pattern in their own messages, thank them, don't ask for details in class, and tell the counselor the same day. Nobody should forward any images involved.",
+            prompts: [
+              { q: "Which message would you have flagged first?", listenFor: "Any of them. Earlier is better, but it's never too late." },
+              { q: "What is each move trying to do?", listenFor: "Flattery builds trust. \"Just between us\" cuts you off. Guilt stops you leaving." },
+              { q: "Why isn't confronting them the best move?", listenFor: "It can make the pressure worse. Save, step back, and tell an adult." }
+            ],
+            examples: [
+              {
+                kind: "list",
+                title: "The pattern, step by step",
+                items: [
+                  "Flattery: \"You're so mature for your age.\"",
+                  "Secrecy: \"Just between us. Don't tell anyone.\"",
+                  "A request: photos, personal information, or meeting up.",
+                  "Guilt: \"I'd be so upset if you stopped talking to me.\""
+                ]
+              },
+              {
+                kind: "list",
+                title: "What to do",
+                items: [
+                  "Don't reply to the request.",
+                  "Screenshot the messages, the username, and the dates. Don't forward any images.",
+                  "Tell a parent, teacher, or the counselor. You won't be in trouble."
+                ]
+              },
+              {
+                kind: "mythfact",
+                title: "Myth or fact",
+                items: [
+                  { myth: "If you replied at first, it's partly your fault.", fact: "It's never your fault. This pattern is designed to work on anyone." },
+                  { myth: "Feeling guilty means you owe them a reply.", fact: "The guilt is part of the pattern. You don't owe anyone a reply." }
+                ]
+              }
+            ],
+            story: {
+              body: "Megha's friend showed her a chat that had started with \"you're so mature\" and had become \"send me a pic, just between us.\" Megha said, \"That's the exact pattern from life skills class.\" They screenshotted the messages together, and her friend told her mum that evening. Her mum reported the account the same night.",
+              question: "What did knowing the pattern change for them?"
+            },
+            practice: {
+              title: "Message Decoder",
+              steps: [
+                "Work as a team.",
+                "Write a made-up, non-graphic message thread of four short messages that follows the four-step pattern.",
+                "Swap with another team. Label each message: flattery, secrecy, request, or guilt. Then write the first thing you'd do."
+              ],
+              rounds: [{ label: "Write it", seconds: 90 }, { label: "Swap and decode", seconds: 90 }]
+            },
+            exitCheck: "How confident are you that you'd recognize this pattern in a real conversation?",
+            mission: "This week, save the number of one adult you'd go to if something online felt wrong, somewhere easy to find."
+          }
         },
         {
           id: "the-ask-that-changed",
@@ -183,7 +441,55 @@ const MODULE_DIGITAL_SAFETY_GIRLS = {
             E: "The explanation, or the lack of a good one, tells you something useful."
           },
           concept: "The first uncomfortable ask in an online relationship is rarely random. It's usually a test to see what you'll accept, and each yes tends to make the next ask easier.",
-          takeaway: "What's a way of saying 'no' to someone you've talked to for months, that you'd actually feel able to use?"
+          takeaway: "What's a way of saying 'no' to someone you've talked to for months, that you'd actually feel able to use?",
+          lesson: {
+            goal: "Students learn that a first uncomfortable request is often a test, and practice a clear no paired with telling a trusted adult.",
+            skills: ["Decision making", "Self-awareness"],
+            focus: ["R", "D"],
+            needs: "The smartboard. Paper and a pen for each team.",
+            careNote: "Never role-play this request in class. If a student says they've been asked for photos, personal details, or to meet up, thank them, don't ask for details in class, and tell the counselor the same day.",
+            prompts: [
+              { q: "Does knowing someone for months make a request like this okay?", listenFor: "No. Time spent chatting isn't the same as trust earned." },
+              { q: "What does their reaction to a no tell you?", listenFor: "If they respect it, fine. Pressure or guilt means it's a pattern." },
+              { q: "Why combine a no with telling an adult?", listenFor: "So you're not alone when you find out how they react." }
+            ],
+            examples: [
+              {
+                kind: "ladder",
+                title: "A clear no",
+                situation: "\"We've been talking for months. You can trust me. Just send one photo.\"",
+                rungs: [
+                  { label: "Weak", strength: 1, text: "\"Maybe later...\"", note: "It sounds like a yes is coming, so they'll ask again." },
+                  { label: "Enough", strength: 3, text: "\"No.\"", note: "A no is a complete answer. You don't owe a reason." },
+                  { label: "Enough, with support", strength: 3, text: "\"No.\" (Then telling a trusted adult about the request.)", note: "The boundary, plus someone on your side before you see how they react." }
+                ]
+              },
+              {
+                kind: "list",
+                title: "If someone from online wants to meet",
+                items: [
+                  "The safest choice is not to meet someone you only know online.",
+                  "If it ever happens, a parent or trusted adult must know first, and come with you.",
+                  "Never go somewhere they choose, and never go alone."
+                ]
+              }
+            ],
+            story: {
+              body: "After four months of chatting, the person Tanvi talked to online asked to meet at a café near the bus depot and told her not to \"make it a big deal.\" Tanvi said no, and told her aunt the same day. Her aunt helped her block and report the account. Two days later the profile was deleted, and its photo turned out to belong to someone else.",
+              question: "What did telling her aunt the same day give Tanvi?"
+            },
+            practice: {
+              title: "No, plus one",
+              steps: [
+                "Work as a team. This one is written, not acted out.",
+                "Write a clear no to an uncomfortable request, in one line.",
+                "Add the one adult you'd tell, and how you'd start that conversation. Share your first line."
+              ],
+              rounds: [{ label: "Write it", seconds: 90 }]
+            },
+            exitCheck: "How sure are you that you'd say no, and tell someone, if a request like this came?",
+            mission: "This week, write down your own one-line no, in words you'd actually use. Keep it somewhere private."
+          }
         },
         {
           id: "if-i-tell-what-happens",
@@ -208,7 +514,55 @@ const MODULE_DIGITAL_SAFETY_GIRLS = {
             E: "You find real information about the actual process: how to save evidence, who gets involved, what happens next, before deciding."
           },
           concept: "Nothing that's happened to you makes you stupid or bad. This is a pattern designed to work on anyone. It's not something you should have seen coming. Telling someone is what actually changes what happens next. Almost every trusted adult reacts with relief that you told them, not anger.<br><br><b>If you ever need it:</b> Childline India — 1098 (24&#47;7) · Cybercrime helpline — 1930 (24&#47;7) · iCall (TISS) — 9152987821 · Delhi Women's Helpline — 181. You don't need to already know what to say.",
-          takeaway: "Who is one specific adult you'd actually go to first, if you needed to?"
+          takeaway: "Who is one specific adult you'd actually go to first, if you needed to?",
+          lesson: {
+            goal: "Students replace imagined fears about telling with what really happens, learn that it's never their fault, and know which adults and helplines they can turn to.",
+            skills: ["Coping with stress", "Decision making"],
+            focus: ["R", "A"],
+            needs: "The smartboard.",
+            careNote: "This lesson may prompt a real disclosure, during class or after it. Respond the way the scenario describes: \"Thank you for telling me. I'm glad you did. You're not in trouble.\" Don't ask for details in front of others, don't promise to keep it secret, and tell the counselor the same day.",
+            prompts: [
+              { q: "What are people most afraid of when they think about telling?", listenFor: "Getting in trouble, losing their phone, people finding out, being blamed." },
+              { q: "Whose fault is it, really?", listenFor: "Never the person it happened to." },
+              { q: "What should a good first response from an adult sound like?", listenFor: "\"Thank you for telling me. You're not in trouble.\"" }
+            ],
+            examples: [
+              {
+                kind: "mythfact",
+                title: "Fear or fact",
+                items: [
+                  { myth: "You'll get in trouble for what happened.", fact: "You won't. Telling is the right thing to do, and the adult's job is to help." },
+                  { myth: "Everyone will find out.", fact: "A trusted adult or counselor shares only what's needed to keep you safe." },
+                  { myth: "It's your fault for replying.", fact: "It's never your fault. These patterns are designed to work on anyone." }
+                ]
+              },
+              {
+                kind: "list",
+                title: "What usually happens when you tell",
+                items: [
+                  "The adult thanks you and stays calm.",
+                  "Together, you save the messages and details.",
+                  "They help decide the next steps: blocking, reporting, or school support.",
+                  "You keep getting support. You're not handling it alone anymore."
+                ]
+              }
+            ],
+            story: {
+              body: "Zoya kept a chat secret for weeks, sure her dad would take her phone and be angry. When she finally told her school counselor, the first thing she heard was, \"Thank you for telling me. You're not in trouble.\" The counselor helped her talk to her dad. He was upset, but at the other person, not at her.",
+              question: "How was what happened different from what Zoya had imagined?"
+            },
+            practice: {
+              title: "The first sentence",
+              steps: [
+                "Work as a team.",
+                "Write three ways someone could start telling a trusted adult, like \"Can I talk to you about something that happened online?\"",
+                "Read them out. Notice how short a first sentence can be."
+              ],
+              rounds: [{ label: "Write them", seconds: 90 }]
+            },
+            exitCheck: "How sure are you about who you'd go to, and what you'd say first?",
+            mission: "This week, save one trusted adult's number in your phone, along with the helpline numbers from today's lesson."
+          }
         },
         {
           id: "the-screenshot-you-kept",
@@ -233,7 +587,54 @@ const MODULE_DIGITAL_SAFETY_GIRLS = {
             E: "It may raise awareness, but it can also alert the person involved, complicate any formal report, and put more of the situation in public than you may want."
           },
           concept: "Saving evidence isn't about proving anything to anyone yet. It's about making sure the record still exists, whenever you do decide to tell someone. You shouldn't have to handle the reporting step alone. A trusted adult can help you through the cybercrime helpline (1930) or the school's own process.",
-          takeaway: "If a friend came to you with exactly this, what's the very first thing you'd tell them to do?"
+          takeaway: "If a friend came to you with exactly this, what's the very first thing you'd tell them to do?",
+          lesson: {
+            goal: "Students learn what to save and what not to do after something goes wrong online, and that the reporting step happens with a trusted adult, not alone.",
+            skills: ["Problem solving", "Decision making"],
+            focus: ["R", "C"],
+            needs: "The smartboard. Paper and a pen for each team.",
+            careNote: "Saving messages, usernames, and dates helps. If any saved content includes sexual images, no one, students or staff, should forward or share it, even to report it. Tell the counselor, who can report through the proper channel, such as the cybercrime helpline (1930) or cybercrime.gov.in.",
+            prompts: [
+              { q: "Why is deleting everything tempting, and what's the risk?", listenFor: "You want it over. But the record disappears if it isn't over." },
+              { q: "What's the problem with posting about it publicly?", listenFor: "It can alert them, and make a formal report harder." },
+              { q: "Who should handle the reporting?", listenFor: "You and a trusted adult together. Not you alone." }
+            ],
+            examples: [
+              {
+                kind: "list",
+                title: "Save this",
+                items: [
+                  "Screenshots of the messages, showing the dates and times.",
+                  "The person's username, profile link, and any other accounts they used.",
+                  "Anything they sent that asked for something or threatened you."
+                ]
+              },
+              {
+                kind: "list",
+                title: "Don't do this",
+                items: [
+                  "Don't forward or share any images, not even with friends.",
+                  "Don't confront them alone.",
+                  "Don't post about it publicly before talking to an adult."
+                ]
+              }
+            ],
+            story: {
+              body: "When an online conversation went badly wrong, Kavya's first instinct was to delete the whole chat. Her friend said, \"Wait. Screenshot the messages and his username first.\" Kavya did, then showed her mum. Because the account details were saved, her mum could report it properly, even after he deleted his profile.",
+              question: "Why did the saved username matter so much?"
+            },
+            practice: {
+              title: "Tell a friend what to do",
+              steps: [
+                "Work as a team.",
+                "A friend messages you: \"Something went wrong online and I just want to delete everything.\" Write your reply in four short lines or fewer.",
+                "Include what to save, what not to do, and who to tell. Then share it."
+              ],
+              rounds: [{ label: "Write it", seconds: 90 }]
+            },
+            exitCheck: "How clear are you on what to save, and who to go to, if something went wrong online?",
+            mission: "This week, find out how to take a screenshot on your phone that shows the date and time. Hopefully you'll never need it."
+          }
         }
       ]
     }
